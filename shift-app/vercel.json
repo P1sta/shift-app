@@ -1,28 +1,10 @@
 {
-  "buildCommand": "echo 'Static deployment'",
+  "buildCommand": "echo 'Static site'",
   "outputDirectory": ".",
-  "env": {
-    "JWT_SECRET": "@jwt_secret"
-  },
   "rewrites": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "destination": "/index.html"
-    }
-  ],
-  "headers": [
-    {
-      "source": "/:path*",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Cache-Control",
-          "value": "public, max-age=3600"
-        }
-      ]
     }
   ]
 }
