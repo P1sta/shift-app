@@ -1,0 +1,3796 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=5.0">
+    <meta name="theme-color" content="#c41e3a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Směny Poupě">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%23c41e3a' width='192' height='192'/><text x='96' y='140' font-size='120' text-anchor='middle' fill='white' font-weight='bold'>📅</text></svg>">
+    <title>Směny Poupě - Správa služeb</title>
+    <style>
+        /* CSS Variables for Theme */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f5f5f5;
+            --text-primary: #333333;
+            --text-secondary: #666666;
+            --border-color: #e0e0e0;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
+
+        html.dark-mode {
+            --bg-primary: #1e1e1e;
+            --bg-secondary: #2a2a2a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #444444;
+            --shadow-color: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1000px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px var(--shadow-color);
+            overflow: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Dark Mode Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            cursor: pointer;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px var(--shadow-color);
+        }
+
+        .theme-toggle:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px var(--shadow-color);
+        }
+
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+            border-bottom: 8px solid #c41e3a;
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .header-logo {
+            width: 80px;
+            height: 80px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+        }
+
+        .header-text h1 {
+            font-size: 36px;
+            margin-bottom: 0;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .content {
+            padding: 40px;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        /* Login Section */
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #c41e3a;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%);
+            color: white;
+            border: 2px solid #c41e3a;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(196, 30, 58, 0.6);
+            background: linear-gradient(135deg, #8b0000 0%, #c41e3a 100%);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 10px rgba(196, 30, 58, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+            margin-top: 10px;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+            box-shadow: none;
+        }
+
+        .btn-small {
+            padding: 10px 16px;
+            font-size: 13px;
+            width: auto;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%);
+        }
+
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .toggle-form button {
+            background: none;
+            border: none;
+            color: #c41e3a;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* Dashboard */
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+
+        .user-details h3 {
+            font-size: 14px;
+            margin: 0;
+            color: #333;
+        }
+
+        .user-details p {
+            font-size: 12px;
+            color: #999;
+            margin: 0;
+        }
+
+        .btn-logout {
+            padding: 8px 16px;
+            background: #f0f0f0;
+            color: #333;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        /* Admin Controls */
+        .admin-controls {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+            border-left: 4px solid #c41e3a;
+        }
+
+        .admin-controls h3 {
+            margin-bottom: 15px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .control-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .control-group input {
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        /* Shifts Grid */
+        .shifts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .shift-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-left: 5px solid #c41e3a;
+            border-radius: 4px;
+            padding: 20px;
+            transition: all 0.3s;
+            position: relative;
+        }
+
+        .shift-card:hover {
+            border-left: 5px solid #8b0000;
+            box-shadow: 0 8px 20px rgba(196, 30, 58, 0.25);
+            transform: translateY(-3px);
+        }
+
+        .shift-card.registered {
+            background: #fff8f8;
+            border-left: 5px solid #8b0000;
+            border-color: #c41e3a;
+        }
+
+        .shift-date {
+            font-size: 13px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .shift-time {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .shift-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .status-available {
+            background: #e8f5e9;
+            color: #1b5e20;
+        }
+
+        .status-registered {
+            background: #fff3e0;
+            color: #e65100;
+        }
+
+        .status-full {
+            background: #ffebee;
+            color: #c41e3a;
+            font-weight: 700;
+        }
+
+        .shift-info {
+            font-size: 13px;
+            color: #666;
+            margin-bottom: 12px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .shift-info div {
+            margin-bottom: 4px;
+        }
+
+        .shift-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .shift-actions button {
+            flex: 1;
+            padding: 8px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%);
+            color: white;
+        }
+
+        .btn-register:hover {
+            opacity: 0.9;
+        }
+
+        .btn-unregister {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-unregister:hover {
+            background: #e0e0e0;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            animation: fadeIn 0.3s;
+        }
+
+        .modal.show {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 400px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-close {
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        /* Messages */
+        .message {
+            padding: 12px 16px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            animation: slideIn 0.3s;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        /* Calendar Styles */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .calendar-weekday {
+            text-align: center;
+            font-weight: 600;
+            color: #666;
+            padding: 10px 0;
+            font-size: 12px;
+            border-bottom: 2px solid #e0e0e0;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 8px;
+            background: #f9f9f9;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .calendar-day:hover {
+            border-color: #c41e3a;
+            box-shadow: 0 3px 10px rgba(102, 126, 234, 0.15);
+        }
+
+        .calendar-day.other-month {
+            background: #f0f0f0;
+            color: #ccc;
+        }
+
+        .calendar-day.today {
+            background: #e6f1fb;
+            border-color: #c41e3a;
+            font-weight: 600;
+        }
+
+        .calendar-day-number {
+            font-weight: 600;
+            color: #333;
+            font-size: 12px;
+            margin-bottom: 4px;
+        }
+
+        .calendar-day.other-month .calendar-day-number {
+            color: #ccc;
+        }
+
+        .calendar-shifts {
+            flex: 1;
+            overflow-y: auto;
+            font-size: 11px;
+        }
+
+        .calendar-shift {
+            background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%);
+            color: white;
+            padding: 3px 4px;
+            border-radius: 3px;
+            margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            line-height: 1.2;
+        }
+
+        .calendar-shift.full {
+            background: #dc3545;
+        }
+
+        .shift-modal {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .registered-employee {
+            background: #f0f0f0;
+            padding: 8px;
+            margin: 4px 0;
+            border-radius: 4px;
+            border-left: 3px solid #c41e3a;
+            font-size: 13px;
+        }
+
+        .request-card {
+            background: #fff8e1;
+            border: 2px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .request-info {
+            flex: 1;
+        }
+
+        .request-info h4 {
+            margin: 0 0 8px 0;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .request-info p {
+            margin: 4px 0;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .request-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .request-actions button {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-approve {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-approve:hover {
+            background: #218838;
+        }
+
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-reject:hover {
+            background: #c82333;
+        }
+
+        .empty-requests {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-requests p {
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        .user-card {
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-left: 5px solid #c41e3a;
+            border-radius: 4px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s;
+        }
+
+        .user-card:hover {
+            border-left: 5px solid #8b0000;
+            box-shadow: 0 4px 12px rgba(196, 30, 58, 0.15);
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-info h4 {
+            margin: 0 0 4px 0;
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-info p {
+            margin: 2px 0;
+            color: #666;
+            font-size: 12px;
+        }
+
+        .user-role-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .role-superadmin {
+            background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%);
+            color: white;
+            font-weight: 700;
+        }
+
+        .role-manager {
+            background: #1a1a1a;
+            color: white;
+            font-weight: 700;
+        }
+
+        .role-user {
+            background: #666;
+            color: white;
+            font-weight: 700;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .user-actions button {
+            padding: 8px 14px !important;
+            border: none !important;
+            border-radius: 4px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            transition: all 0.3s !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        .btn-change-role {
+            background: linear-gradient(135deg, #f39c12 0%, #e67e22 100%) !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 14px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            font-weight: 700 !important;
+            font-size: 12px !important;
+            transition: all 0.3s !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        .btn-change-role:hover {
+            background: linear-gradient(135deg, #e67e22 0%, #d35400 100%) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(243, 156, 18, 0.4) !important;
+        }
+
+        .btn-delete-user {
+            background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%) !important;
+            color: white !important;
+            border: none !important;
+            padding: 8px 14px !important;
+            border-radius: 4px !important;
+            cursor: pointer !important;
+            font-weight: 700 !important;
+            font-size: 12px !important;
+            transition: all 0.3s !important;
+            text-transform: uppercase !important;
+            letter-spacing: 0.5px !important;
+        }
+
+        .btn-delete-user:hover {
+            background: linear-gradient(135deg, #8b0000 0%, #5c0000 100%) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(196, 30, 58, 0.6) !important;
+        }
+
+        .invite-code-card {
+            background: #e8f4f8;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .code-info {
+            flex: 1;
+        }
+
+        .code-info p {
+            margin: 2px 0;
+            color: #333;
+            font-size: 12px;
+        }
+
+        .code-value {
+            font-family: monospace;
+            font-weight: 600;
+            color: #3498db;
+            font-size: 13px;
+        }
+
+        .code-actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .btn-copy-code {
+            padding: 8px 12px !important;
+            background: #3498db !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 4px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            transition: all 0.2s !important;
+        }
+
+        .btn-copy-code:hover {
+            background: #2980b9 !important;
+            transform: scale(1.05) !important;
+        }
+
+        .btn-copy-code:active {
+            transform: scale(0.95) !important;
+        }
+
+        .btn-revoke-code {
+            padding: 8px 12px !important;
+            background: #c41e3a !important;
+            color: white !important;
+            border: none !important;
+            border-radius: 4px !important;
+            font-size: 12px !important;
+            font-weight: 700 !important;
+            cursor: pointer !important;
+            transition: all 0.2s !important;
+        }
+
+        .btn-revoke-code:hover {
+            background: #8b0000 !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(196, 30, 58, 0.4) !important;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #999;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+            margin: 10px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                border-radius: 0;
+                box-shadow: none;
+            }
+
+            .header {
+                padding: 25px 20px;
+                border-bottom: 5px solid #c41e3a;
+            }
+
+            .header-content {
+                gap: 15px;
+            }
+
+            .header-logo {
+                width: 60px;
+                height: 60px;
+                font-size: 30px;
+            }
+
+            .header-text h1 {
+                font-size: 24px;
+                letter-spacing: 1px;
+            }
+
+            .content {
+                padding: 25px 15px;
+                position: relative;
+            }
+
+            /* Language buttons - mobile friendly */
+            .content > div:first-child {
+                position: fixed !important;
+                top: 10px !important;
+                right: 10px !important;
+                gap: 3px !important;
+                z-index: 100;
+            }
+
+            .content > div:first-child button {
+                padding: 6px 10px !important;
+                font-size: 12px !important;
+            }
+
+            .control-group {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            .shifts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .dashboard-header {
+                flex-direction: column;
+                gap: 12px;
+                align-items: flex-start;
+            }
+
+            .user-info {
+                width: 100%;
+            }
+
+            .btn-logout {
+                width: 100%;
+            }
+
+            .btn, .btn-small {
+                padding: 12px 16px;
+                font-size: 14px;
+                min-height: 44px;
+            }
+
+            .form-group {
+                margin-bottom: 15px;
+            }
+
+            .form-group input, .form-group select, .form-group textarea {
+                font-size: 16px;
+                padding: 12px;
+            }
+
+            .login-form, .register-form {
+                max-width: 100%;
+                padding: 0;
+            }
+
+            .toggle-form {
+                font-size: 13px;
+                margin-top: 15px;
+            }
+
+            .section h3 {
+                font-size: 18px;
+                margin-bottom: 15px;
+            }
+
+            /* Tabs - better touch targets */
+            button[onclick*="toggle"] {
+                min-height: 44px;
+                padding: 10px 12px;
+                font-size: 13px;
+                flex: 1;
+            }
+
+            /* Cards and shifts */
+            .card {
+                padding: 15px;
+            }
+
+            .shift-card {
+                padding: 15px;
+            }
+
+            /* Modal dialogs - better for mobile */
+            #confirmModal {
+                max-width: 90vw;
+                margin: 0 auto;
+                padding: 20px;
+            }
+
+            #confirmModal h2 {
+                font-size: 18px;
+            }
+
+            /* Tables - scroll on mobile */
+            table {
+                font-size: 13px;
+            }
+
+            table th, table td {
+                padding: 8px 10px;
+            }
+
+            /* Better spacing for messages */
+            .success-message, .error-message, [style*="color: #2ecc71"], [style*="color: #e74c3c"] {
+                padding: 15px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+                width: 45px;
+                height: 45px;
+                font-size: 20px;
+            }
+
+            .header {
+                padding: 20px 15px;
+            }
+
+            .header-logo {
+                width: 50px;
+                height: 50px;
+                font-size: 24px;
+            }
+
+            .header-text h1 {
+                font-size: 20px;
+                letter-spacing: 0.5px;
+            }
+
+            .content {
+                padding: 15px 12px;
+            }
+
+            .content > div:first-child button {
+                padding: 5px 8px !important;
+                font-size: 11px !important;
+            }
+
+            .btn, .btn-small {
+                padding: 10px 12px;
+                font-size: 13px;
+                min-height: 40px;
+            }
+
+            .form-group {
+                margin-bottom: 12px;
+            }
+
+            .form-group input, .form-group select, .form-group textarea {
+                font-size: 16px;
+                padding: 10px;
+            }
+
+            .section h3 {
+                font-size: 16px;
+                margin-bottom: 12px;
+            }
+
+            .section p {
+                font-size: 13px;
+                line-height: 1.5;
+            }
+
+            /* Stack buttons vertically */
+            button[onclick*="toggle"] {
+                min-height: 40px;
+                padding: 8px 10px;
+                font-size: 12px;
+            }
+
+            .dashboard-buttons {
+                gap: 8px;
+            }
+
+            .card, .shift-card {
+                padding: 12px;
+            }
+
+            .admin-controls {
+                padding: 15px;
+                margin-bottom: 15px;
+            }
+
+            table th, table td {
+                padding: 6px 8px;
+                font-size: 12px;
+            }
+
+            .control-group input, .control-group select {
+                font-size: 16px;
+            }
+
+            .content {
+                padding: 15px 12px 80px 12px; /* Extra bottom for nav */
+            }
+
+            /* Bottom Navigation Bar */
+            .bottom-nav {
+                position: fixed;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                display: flex;
+                background: white;
+                border-top: 2px solid #e0e0e0;
+                z-index: 500;
+                padding-bottom: env(safe-area-inset-bottom);
+            }
+
+            .bottom-nav button {
+                flex: 1;
+                padding: 12px 8px;
+                background: #f0f0f0;
+                border: none;
+                font-size: 11px;
+                cursor: pointer;
+                border-top: 3px solid transparent;
+                transition: all 0.3s ease;
+                min-height: 48px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .bottom-nav button.active {
+                background: white;
+                border-top-color: #c41e3a;
+                color: #c41e3a;
+                font-weight: bold;
+            }
+
+            /* Hide top tabs on mobile */
+            .tab-buttons {
+                display: none !important;
+            }
+
+            /* Animations */
+            @keyframes slideIn {
+                from { transform: translateX(400px); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(400px); opacity: 0; }
+            }
+
+            /* Notification toast */
+            .notification-toast {
+                animation: slideIn 0.3s ease;
+            }
+
+            /* Sync indicator */
+            .sync-status {
+                position: fixed;
+                top: 70px;
+                right: 15px;
+                font-size: 12px;
+                padding: 6px 12px;
+                background: #3498db;
+                color: white;
+                border-radius: 20px;
+                z-index: 999;
+            }
+
+            /* Ensure inputs work on mobile */
+            input[type="date"],
+            input[type="time"] {
+                width: 100%;
+                min-height: 44px;
+                font-size: 16px;
+            }
+
+            /* No horizontal scroll */
+            body {
+                overflow-x: hidden;
+            }
+        }
+
+        /* Manual Dark Mode Styles */
+        html.dark-mode {
+            --bg-primary: #1e1e1e;
+            --bg-secondary: #2a2a2a;
+            --text-primary: #e0e0e0;
+            --text-secondary: #b0b0b0;
+            --border-color: #444444;
+            --shadow-color: rgba(255, 255, 255, 0.1);
+        }
+
+        html.dark-mode .container {
+            background: #1e1e1e;
+            color: #e0e0e0;
+        }
+
+        html.dark-mode input, 
+        html.dark-mode textarea, 
+        html.dark-mode select {
+            background: #2a2a2a !important;
+            color: #e0e0e0 !important;
+            border-color: #444 !important;
+        }
+
+        html.dark-mode input::placeholder {
+            color: #888 !important;
+        }
+
+        html.dark-mode .card, 
+        html.dark-mode .shift-card, 
+        html.dark-mode .user-card, 
+        html.dark-mode .request-card {
+            background: #2a2a2a;
+            border-color: #444;
+            color: #e0e0e0;
+        }
+
+        html.dark-mode .admin-controls, 
+        html.dark-mode .control-group {
+            background: #2a2a2a;
+            border-color: #444;
+        }
+
+        html.dark-mode table {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+
+        html.dark-mode table th {
+            background: #1a1a1a;
+            color: #e0e0e0;
+            border-color: #444;
+        }
+
+        html.dark-mode table td {
+            border-color: #444;
+        }
+
+        html.dark-mode .message {
+            background: #2a2a2a;
+            border-color: #444;
+        }
+
+        html.dark-mode .section h3 {
+            color: #e0e0e0;
+        }
+
+        html.dark-mode .section p {
+            color: #b0b0b0;
+        }
+
+        html.dark-mode #confirmModal {
+            background: #2a2a2a;
+            color: #e0e0e0;
+        }
+
+        html.dark-mode #confirmModal h2 {
+            color: #e0e0e0;
+        }
+
+        html.dark-mode .bottom-nav {
+            background: #2a2a2a;
+            border-top-color: #444;
+        }
+
+        html.dark-mode .bottom-nav button {
+            background: #1e1e1e;
+            color: #e0e0e0;
+            border-color: #444;
+        }
+
+        html.dark-mode .bottom-nav button.active {
+            background: #2a2a2a;
+            border-top-color: #c41e3a;
+            color: #c41e3a;
+        }
+
+        html.dark-mode .empty-state, 
+        html.dark-mode .empty-requests {
+            background: #2a2a2a;
+            color: #b0b0b0;
+        }
+    </style>
+</head>
+<body>
+    <!-- Dark Mode Toggle Button -->
+    <button class="theme-toggle" id="themeToggle" onclick="toggleDarkMode()" title="Toggle dark mode" aria-label="Toggle dark mode">🌙</button>
+
+    <div class="container">
+        <div class="header">
+            <div class="header-content">
+                <div class="header-logo">🍺</div>
+                <div class="header-text">
+                    <h1>Směny Poupě</h1>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <!-- Language Selector -->
+            <div style="position: absolute; top: 20px; right: 20px; display: flex; gap: 5px;">
+                <button data-lang-btn="en" onclick="setLanguage('en')" style="background: var(--bg-secondary); color: var(--text-primary); padding: 8px 12px; border-radius: 4px; border: 2px solid var(--border-color); cursor: pointer; font-weight: 600; transition: all 0.3s ease;">EN</button>
+                <button data-lang-btn="cs" onclick="setLanguage('cs')" style="background: var(--bg-secondary); color: var(--text-primary); padding: 8px 12px; border-radius: 4px; border: 2px solid var(--border-color); cursor: pointer; font-weight: 600; transition: all 0.3s ease;">CS</button>
+                <button data-lang-btn="sk" onclick="setLanguage('sk')" style="background: var(--bg-secondary); color: var(--text-primary); padding: 8px 12px; border-radius: 4px; border: 2px solid var(--border-color); cursor: pointer; font-weight: 600; transition: all 0.3s ease;">SK</button>
+            </div>
+
+            <!-- Login Section -->
+            <div id="loginSection" class="section active">
+                <div class="login-form">
+                    <div id="loginMessage"></div>
+                    
+                    <h2 style="margin-bottom: 20px; text-align: center; color: #333;">Login</h2>
+                    
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com" aria-label="Email address for login">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••" aria-label="Password for login">
+                    </div>
+
+                    <button class="btn" onclick="login()" aria-label="Submit login form">Login</button>
+
+                    <div class="toggle-form">
+                        Don't have an account? <button onclick="toggleForms()">Register here</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Register Section -->
+            <div id="registerSection" class="section">
+                <div class="login-form">
+                    <div id="registerMessage"></div>
+                    
+                    <h2 style="margin-bottom: 20px; text-align: center; color: #333;">Create Account</h2>
+                    
+                    <div class="form-group">
+                        <label for="registerName">Full Name</label>
+                        <input type="text" id="registerName" placeholder="John Doe">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerEmail">Email</label>
+                        <input type="email" id="registerEmail" placeholder="your@email.com">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerPassword">Password</label>
+                        <input type="password" id="registerPassword" placeholder="••••••••">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="registerInviteCode">Invite Code</label>
+                        <input type="text" id="registerInviteCode" placeholder="Ask your manager for invite code">
+                    </div>
+
+                    <button class="btn" onclick="register()">Create Account</button>
+
+                    <div class="toggle-form">
+                        Already have an account? <button onclick="toggleForms()">Login here</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="section">
+                <div class="dashboard-header">
+                    <div class="user-info">
+                        <div class="user-avatar" id="userAvatar">JD</div>
+                        <div class="user-details">
+                            <h3 id="userName">John Doe</h3>
+                            <p id="userRole">Employee</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div style="display: flex; gap: 5px;">
+                            <button data-lang-btn="en" onclick="setLanguage('en')" style="background: #f0f0f0; color: #333; padding: 6px 12px; border-radius: 4px; border: 2px solid #ddd; cursor: pointer; font-weight: 600;">EN</button>
+                            <button data-lang-btn="cs" onclick="setLanguage('cs')" style="background: #f0f0f0; color: #333; padding: 6px 12px; border-radius: 4px; border: 2px solid #ddd; cursor: pointer; font-weight: 600;">CS</button>
+                            <button data-lang-btn="sk" onclick="setLanguage('sk')" style="background: #f0f0f0; color: #333; padding: 6px 12px; border-radius: 4px; border: 2px solid #ddd; cursor: pointer; font-weight: 600;">SK</button>
+                        </div>
+                        <button class="btn-logout" onclick="logout()">Logout</button>
+                    </div>
+                </div>
+
+                <div id="dashboardMessage"></div>
+
+                <!-- Admin Section -->
+                <div id="adminSection" style="display: none;">
+                    <div style="margin-bottom: 30px;">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                            <button class="btn btn-small" onclick="toggleAdminView('create')" id="btnCreate" style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); color: white;">Create Shift</button>
+                            <button class="btn btn-small" onclick="toggleAdminView('calendar')" id="btnCalendar" style="background: #f0f0f0; color: #333;">Monthly Overview</button>
+                            <button class="btn btn-small" onclick="toggleAdminView('requests')" id="btnRequests" style="background: #f0f0f0; color: #333;">Cancellation Requests</button>
+                        </div>
+
+                        <!-- Create Shift View -->
+                        <div id="createShiftView" class="admin-controls">
+                            <h3>Create Shifts</h3>
+                            <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Create single or bulk shifts across multiple days</p>
+                            
+                            <div class="control-group">
+                                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Shift Details</label>
+                                <input type="time" id="shiftStartTime" value="17:00" placeholder="Start Time">
+                                <input type="time" id="shiftEndTime" value="23:00" placeholder="End Time">
+                                <input type="number" id="shiftSlots" min="1" max="10" value="1" placeholder="Number of slots">
+                                <input type="text" id="shiftPosition" placeholder="Position (e.g., Waiter, Chef)">
+                            </div>
+
+                            <div class="control-group">
+                                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Select Days</label>
+                                <div style="display: flex; gap: 8px; margin-bottom: 12px;">
+                                    <button class="btn btn-small" onclick="toggleSelectAllDays()" style="background: #f0f0f0; color: #333; flex: 1;">Select All</button>
+                                    <button class="btn btn-small" onclick="toggleClearAllDays()" style="background: #f0f0f0; color: #333; flex: 1;">Clear All</button>
+                                </div>
+                                <div id="daySelector" style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;"></div>
+                            </div>
+
+                            <div style="margin-bottom: 15px;">
+                                <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #333;">Or Select Date Range</label>
+                                <div class="control-group">
+                                    <input type="date" id="rangeStartDate" placeholder="Start date">
+                                    <input type="date" id="rangeEndDate" placeholder="End date">
+                                    <button class="btn btn-small" onclick="populateFromDateRange()" style="background: #3498db; color: white;">Apply Date Range</button>
+                                </div>
+                            </div>
+
+                            <div style="margin-bottom: 15px; padding: 12px; background: #f0f0f0; border-radius: 6px;">
+                                <p style="margin: 0; color: #666; font-size: 13px;">
+                                    <strong id="selectedDayCount">0</strong> days selected
+                                </p>
+                            </div>
+
+                            <button class="btn" onclick="createBulkShifts()" style="width: 100%; background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%); color: white;">Create Shifts</button>
+                        </div>
+
+                        <!-- Calendar View -->
+                        <div id="calendarView" style="display: none;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                                <button class="btn btn-small" onclick="previousMonth()" style="background: #f0f0f0; color: #333;">← Previous</button>
+                                <h3 id="monthYear" style="margin: 0; color: #333;"></h3>
+                                <button class="btn btn-small" onclick="nextMonth()" style="background: #f0f0f0; color: #333;">Next →</button>
+                            </div>
+                            <div id="calendarContainer" style="background: white; border-radius: 8px; padding: 20px; border: 2px solid #e0e0e0;"></div>
+                        </div>
+
+                        <!-- Cancellation Requests View -->
+                        <div id="requestsView" style="display: none;">
+                            <h3 style="margin-bottom: 20px; color: #333;">Shift Cancellation Requests</h3>
+                            <div id="requestsContainer" style="background: white; border-radius: 8px; padding: 20px; border: 2px solid #e0e0e0;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Superadmin Section -->
+                <div id="superadminSection" style="display: none;">
+                    <div style="margin-bottom: 30px;">
+                        <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                            <button class="btn btn-small" onclick="toggleSuperadminView('users')" id="btnUsers" style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); color: white;">Manage Users</button>
+                            <button class="btn btn-small" onclick="toggleSuperadminView('invites')" id="btnInvites" style="background: #f0f0f0; color: #333;">Invite Codes</button>
+                            <button class="btn btn-small" onclick="toggleSuperadminView('settings')" id="btnSettings" style="background: #f0f0f0; color: #333;">Settings</button>
+                        </div>
+
+                        <!-- Manage Users View -->
+                        <div id="usersView">
+                            <h3 style="margin-bottom: 20px; color: #333;">Team Members</h3>
+                            <div id="usersContainer" style="background: white; border-radius: 8px; padding: 20px; border: 2px solid #e0e0e0;"></div>
+                        </div>
+
+                        <!-- Invite Codes View -->
+                        <div id="invitesView" style="display: none;">
+                            <h3 style="margin-bottom: 20px; color: #333;">Invite Codes</h3>
+                            <div class="admin-controls">
+                                <h3 id="generateNewCodeHeading">Generate New Invite Code</h3>
+                                <div class="control-group">
+                                    <select id="inviteRole" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                                        <option value="manager" data-i18n="manager">Manager</option>
+                                        <option value="user" data-i18n="employee">Employee</option>
+                                    </select>
+                                    <input type="number" id="inviteCount" min="1" max="50" value="1" placeholder="Number of codes" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                                    <button class="btn btn-small" onclick="generateInviteCodes()" id="generateCodesBtn" style="width: 100%;">Generate Codes</button>
+                                </div>
+                            </div>
+                            <div id="invitesContainer" style="background: white; border-radius: 8px; padding: 20px; border: 2px solid #e0e0e0; margin-top: 20px;"></div>
+                        </div>
+
+                        <!-- Settings View -->
+                        <div id="settingsView" style="display: none;">
+                            <h3 style="margin-bottom: 20px; color: #333;">Settings & Administration</h3>
+                            
+                            <div class="admin-controls">
+                                <h3>Reset User Password</h3>
+                                <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Select an employee or manager to reset their password. They can create a new one on next login.</p>
+                                
+                                <div class="control-group">
+                                    <select id="resetPasswordUser" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                                        <option value="">-- Select User to Reset --</option>
+                                    </select>
+                                    <button type="button" class="btn btn-small" onclick="resetUserPassword(); return false;" style="width: 100%; background: #f39c12; color: white;">Reset Password</button>
+                                </div>
+                                
+                            <div id="resetPasswordMessage" style="margin-top: 10px;"></div>
+                            </div>
+
+                            <hr style="border: none; border-top: 2px solid #e0e0e0; margin: 30px 0;">
+
+                            <div class="admin-controls">
+                                <h3>All Users</h3>
+                                <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Complete list of all users in the system.</p>
+                                <div id="allUsersContainer" style="background: white; border-radius: 8px; padding: 15px; border: 2px solid #e0e0e0; max-height: 400px; overflow-y: auto;"></div>
+                            </div>
+
+                            <hr style="border: none; border-top: 2px solid #e0e0e0; margin: 30px 0;">
+
+                            <div class="admin-controls">
+                                <h3>Change Your Own Password</h3>
+                                <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Update your superadmin password.</p>
+                                
+                                <div class="control-group">
+                                    <input type="password" id="currentPassword" placeholder="Current password" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                                    <input type="password" id="newPassword" placeholder="New password" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                                    <input type="password" id="confirmPassword" placeholder="Confirm new password" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                                    <button class="btn btn-small" onclick="changeSuperadminPassword()" style="width: 100%; background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); color: white;">Change My Password</button>
+                                </div>
+                                
+                                <div id="changePasswordMessage" style="margin-top: 10px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Shifts Display -->
+                <div>
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap;">
+                        <button class="btn btn-small" onclick="toggleEmployeeView('myshifts')" id="btnMyShifts" style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); color: white;">My Shifts</button>
+                        <button class="btn btn-small" onclick="toggleEmployeeView('list')" id="btnList" style="background: #f0f0f0; color: #333;">Available Shifts</button>
+                        <button class="btn btn-small" onclick="toggleEmployeeView('calendar')" id="btnCalendarEmp" style="background: #f0f0f0; color: #333;">Month View</button>
+                        <button class="btn btn-small" onclick="toggleEmployeeView('settings')" id="btnEmployeeSettings" style="background: #f0f0f0; color: #333;">Settings</button>
+                    </div>
+
+                    <!-- My Shifts View -->
+                    <div id="myShiftsView">
+                        <h3 style="margin-bottom: 15px; color: #333;">My Registered Shifts</h3>
+                        <div id="myShiftsContainer" class="shifts-grid"></div>
+                    </div>
+
+                    <!-- Shift List View -->
+                    <div id="listView" style="display: none;">
+                        <h3 style="margin-bottom: 15px; color: #333;">Available Shifts</h3>
+                        <div id="shiftsContainer" class="shifts-grid"></div>
+                    </div>
+
+                    <!-- Calendar View for Employees -->
+                    <div id="calendarViewEmp" style="display: none;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                            <button class="btn btn-small" onclick="previousMonthEmployee()" style="background: #f0f0f0; color: #333;">← Previous</button>
+                            <h3 id="monthYearEmp" style="margin: 0; color: #333;"></h3>
+                            <button class="btn btn-small" onclick="nextMonthEmployee()" style="background: #f0f0f0; color: #333;">Next →</button>
+                        </div>
+                        <div id="calendarContainerEmp" style="background: white; border-radius: 8px; padding: 20px; border: 2px solid #e0e0e0;"></div>
+                    </div>
+
+                    <!-- Employee Settings View -->
+                    <div id="employeeSettingsView" style="display: none;">
+                        <h3 style="margin-bottom: 20px; color: #333;">Settings</h3>
+                        
+                        <div class="admin-controls">
+                            <h3>Change Your Password</h3>
+                            <p style="color: #666; font-size: 13px; margin-bottom: 15px;">Update your password to keep your account secure.</p>
+                            
+                            <div class="control-group">
+                                <input type="password" id="empCurrentPassword" placeholder="Current password" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                                <input type="password" id="empNewPassword" placeholder="New password" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                                <input type="password" id="empConfirmPassword" placeholder="Confirm new password" style="padding: 10px; border: 2px solid #e0e0e0; border-radius: 6px; font-size: 13px;">
+                                <button class="btn btn-small" onclick="changeEmployeePassword()" style="width: 100%; background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); color: white;">Change Password</button>
+                            </div>
+                            
+                            <div id="empChangePasswordMessage" style="margin-top: 10px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calendar Day Details Modal -->
+    <div id="dayModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-close" onclick="closeDayModal()">&times;</span>
+                <span id="dayModalTitle">Shifts for Date</span>
+            </div>
+            <div id="dayModalContent" class="shift-modal"></div>
+        </div>
+    </div>
+
+    <!-- Edit Shift Modal -->
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <span class="modal-close" onclick="closeEditModal()">&times;</span>
+                Edit Shift
+            </div>
+            <div class="form-group">
+                <label for="editDate">Date</label>
+                <input type="date" id="editDate">
+            </div>
+            <div class="form-group">
+                <label for="editStart">Start Time</label>
+                <input type="time" id="editStart">
+            </div>
+            <div class="form-group">
+                <label for="editEnd">End Time</label>
+                <input type="time" id="editEnd">
+            </div>
+            <div class="form-group">
+                <label for="editSlots">Slots</label>
+                <input type="number" id="editSlots" min="1" max="10">
+            </div>
+            <div class="form-group">
+                <label for="editPosition">Position</label>
+                <input type="text" id="editPosition">
+            </div>
+            <button class="btn" onclick="saveEdit()">Save Changes</button>
+            <button class="btn btn-secondary" onclick="closeEditModal()">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Custom Confirmation Modal -->
+    <div id="confirmModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+        <div style="background: white; padding: 30px; border-radius: 8px; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+            <h3 id="confirmTitle" style="margin-bottom: 15px; color: #333;">Confirmation</h3>
+            <p id="confirmMessage" style="margin-bottom: 25px; color: #666; font-size: 14px;"></p>
+            <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                <button id="confirmCancel" type="button" class="btn btn-small" style="background: #f0f0f0; color: #333; width: auto;">Cancel</button>
+                <button id="confirmOk" type="button" class="btn btn-small" style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); color: white; width: auto;">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Language translations
+        const translations = {
+            en: {
+                // Navigation & Auth
+                login: 'Login',
+                register: 'Create Account',
+                logout: 'Logout',
+                email: 'Email',
+                password: 'Password',
+                fullName: 'Full Name',
+                inviteCode: 'Invite Code',
+                alreadyHaveAccount: 'Already have an account?',
+                dontHaveAccount: 'Don\'t have an account?',
+                loginHere: 'Login here',
+                registerHere: 'Register here',
+                
+                // Dashboard
+                myShifts: 'Moje Směny',
+                availableShifts: 'Dostupné Směny',
+                monthView: 'Month View',
+                settings: 'Settings',
+                manageUsers: 'Manage Users',
+                inviteCodes: 'Invite Codes',
+                createShift: 'Create Shift',
+                cancellationRequests: 'Cancellation Requests',
+                
+                // Shifts
+                myRegisteredShifts: 'My Registered Shifts',
+                registeredShifts: 'Registered Shifts',
+                availableShiftsTitle: 'Available Shifts',
+                registered: 'Registered',
+                cancellationPending: 'Cancellation Pending',
+                position: 'Position',
+                slots: 'Slots',
+                requestCancel: 'Request Cancel',
+                pendingApproval: 'Pending Approval',
+                registerForShift: 'Register',
+                unregister: 'Unregister',
+                
+                // Password
+                currentPassword: 'Current password',
+                newPassword: 'New password',
+                confirmPassword: 'Confirm new password',
+                changePassword: 'Change Password',
+                changeYourPassword: 'Change Your Password',
+                resetUserPassword: 'Reset User Password',
+                selectUserToReset: '-- Select User to Reset --',
+                resetPassword: 'Reset Password',
+                resetPasswordDesc: 'Select an employee or manager to reset their password. They can create a new one on next login.',
+                changeYourPasswordDesc: 'Update your password to keep your account secure.',
+                passwordChanged: '✅ Password changed successfully!',
+                passwordResetFor: '✅ Password reset for {name}. Temporary password: {password} (They should change this on login)',
+                passwordMustBeDifferent: 'New password must be different from current password',
+                passwordsDoNotMatch: 'New passwords do not match',
+                passwordMinimum: 'Password must be at least 6 characters',
+                currentPasswordIncorrect: 'Current password is incorrect',
+                pleaseSelectUser: 'Please select a user',
+                userNotFound: 'User not found',
+                fillAllFields: 'Please fill all fields',
+                
+                // User Management
+                teamMembers: 'Team Members',
+                owner: 'Owner/Superadmin',
+                manager: 'Manager',
+                employee: 'Employee',
+                changeRole: 'Change Role',
+                deleteUser: 'Delete',
+                deleteUserConfirm: 'Delete {name}? This cannot be undone.',
+                userDeleted: 'User deleted',
+                deleteShift: 'Delete Shift',
+                deleteShiftConfirm: 'Delete this shift? This cannot be undone.',
+                editShift: 'Edit Shift',
+                shiftDeleted: 'Shift deleted',
+                roleUpdatedTo: 'Role updated to {role}',
+                
+                // Invite Codes
+                generateNewInviteCode: 'Generate New Invite Code',
+                generateCodes: 'Generate Codes',
+                activeCodes: 'Active Codes',
+                usedCodes: 'Used Codes',
+                role: 'Role',
+                created: 'Created',
+                usedBy: 'Used by',
+                usedOn: 'Used on',
+                copy: 'Copy',
+                revoke: 'Revoke',
+                revokeCode: 'Revoke this invite code? It can no longer be used.',
+                codesCopied: 'Invite code copied to clipboard! ✓',
+                enterValidCodeCount: 'Enter between 1 and 50 codes',
+                codesGenerated: 'Codes generated successfully!',
+                
+                // Cancellation Requests
+                cancellationRequests: 'Shift Cancellation Requests',
+                noCancellationRequests: 'No pending cancellation requests.',
+                approve: 'Approve',
+                reject: 'Reject',
+                requestedBy: 'Requested by',
+                shift: 'Shift',
+                
+                // Messages
+                askOwnerSetup: 'Google Calendar is not configured yet. Ask your restaurant owner to set it up.',
+                fillAllFieldsError: 'Please fill all fields including invite code',
+                emailAlreadyRegistered: 'Email already registered',
+                invalidExpiredCode: 'Invalid or expired invite code',
+                accountCreated: 'Account created! Please login.',
+                enterEmail: 'Please enter email and password',
+                invalidLogin: 'Invalid email or password',
+                notAuthorized: 'Not authorized',
+            },
+            cs: {
+                // Navigace & Aut
+                login: 'Přihlášení',
+                register: 'Vytvořit účet',
+                logout: 'Odhlášení',
+                email: 'E-mail',
+                password: 'Heslo',
+                fullName: 'Jméno a příjmení',
+                inviteCode: 'Kód pozvánky',
+                alreadyHaveAccount: 'Již máte účet?',
+                dontHaveAccount: 'Nemáte účet?',
+                loginHere: 'Přihlásit se zde',
+                registerHere: 'Zaregistrovat se zde',
+                
+                // Dashboard
+                myShifts: 'Moje Směny',
+                availableShifts: 'Dostupné Směny',
+                monthView: 'Pohled na měsíc',
+                settings: 'Nastavení',
+                manageUsers: 'Správa uživatelů',
+                inviteCodes: 'Kódy pozvánek',
+                createShift: 'Vytvořit službu',
+                cancellationRequests: 'Požadavky na zrušení služby',
+                
+                // Služby
+                myRegisteredShifts: 'Moje registrované služby',
+                registeredShifts: 'Registrované služby',
+                availableShiftsTitle: 'Dostupné služby',
+                registered: 'Registrováno',
+                cancellationPending: 'Zrušení čeká na schválení',
+                position: 'Pozice',
+                slots: 'Sloty',
+                requestCancel: 'Požádat o zrušení',
+                pendingApproval: 'Čeká na schválení',
+                registerForShift: 'Zaregistrovat se',
+                unregister: 'Zrušit registraci',
+                
+                // Heslo
+                currentPassword: 'Aktuální heslo',
+                newPassword: 'Nové heslo',
+                confirmPassword: 'Potvrdit nové heslo',
+                changePassword: 'Změnit heslo',
+                changeYourPassword: 'Změnit vaše heslo',
+                resetUserPassword: 'Resetovat heslo uživatele',
+                selectUserToReset: '-- Vyberte uživatele na reset --',
+                resetPassword: 'Resetovat heslo',
+                resetPasswordDesc: 'Vyberte zaměstnance nebo manažera, abyste resetovali jejich heslo. Mohou si vytvořit nové při příštím přihlášení.',
+                changeYourPasswordDesc: 'Aktualizujte své heslo, abyste udrželi svůj účet v bezpečí.',
+                passwordChanged: '✅ Heslo úspěšně změněno!',
+                passwordResetFor: '✅ Heslo resetováno pro {name}. Dočasné heslo: {password} (Měli by si to změnit při přihlášení)',
+                passwordMustBeDifferent: 'Nové heslo se musí lišit od aktuálního hesla',
+                passwordsDoNotMatch: 'Nová hesla si neodpovídají',
+                passwordMinimum: 'Heslo musí mít alespoň 6 znaků',
+                currentPasswordIncorrect: 'Aktuální heslo je nesprávné',
+                pleaseSelectUser: 'Vyberte uživatele',
+                userNotFound: 'Uživatel nenalezen',
+                fillAllFields: 'Vyplňte prosím všechna pole',
+                
+                // Správa uživatelů
+                teamMembers: 'Členové týmu',
+                owner: 'Majitel/Superadmin',
+                manager: 'Manažer',
+                employee: 'Zaměstnanec',
+                changeRole: 'Změnit roli',
+                deleteUser: 'Smazat',
+                deleteUserConfirm: 'Smazat {name}? Toto nelze vrátit zpět.',
+                userDeleted: 'Uživatel smazán',
+                deleteShift: 'Smazat směnu',
+                deleteShiftConfirm: 'Smazat tuto směnu? Toto nelze vrátit zpět.',
+                editShift: 'Upravit směnu',
+                shiftDeleted: 'Směna smazána',
+                roleUpdatedTo: 'Role aktualizována na {role}',
+                
+                // Kódy pozvánek
+                generateNewInviteCode: 'Generovat nový kód pozvánky',
+                generateCodes: 'Generovat kódy',
+                activeCodes: 'Aktivní kódy',
+                usedCodes: 'Použité kódy',
+                role: 'Role',
+                created: 'Vytvořeno',
+                usedBy: 'Použito uživatelem',
+                usedOn: 'Použito dne',
+                copy: 'Kopírovat',
+                revoke: 'Zrušit',
+                revokeCode: 'Zrušit tento kód pozvánky? Již nebude možné jej použít.',
+                codesCopied: 'Kód pozvánky zkopírován do schránky! ✓',
+                enterValidCodeCount: 'Zadejte mezi 1 a 50 kódy',
+                codesGenerated: 'Kódy byly úspěšně vygenerovány!',
+                
+                // Požadavky na zrušení
+                cancellationRequests: 'Požadavky na zrušení služby',
+                noCancellationRequests: 'Žádné nevyřízené požadavky na zrušení.',
+                approve: 'Schválit',
+                reject: 'Odmítnout',
+                requestedBy: 'Požadoval(a)',
+                shift: 'Služba',
+                
+                // Zprávy
+                askOwnerSetup: 'Google Calendar ještě není nakonfigurován. Požádejte majitele restaurace, aby jej nastavil.',
+                fillAllFieldsError: 'Vyplňte prosím všechna pole včetně kódu pozvánky',
+                emailAlreadyRegistered: 'E-mail již registrován',
+                invalidExpiredCode: 'Neplatný nebo vypršelý kód pozvánky',
+                accountCreated: 'Účet vytvořen! Prosím přihlaste se.',
+                enterEmail: 'Prosím zadejte e-mail a heslo',
+                invalidLogin: 'Neplatný e-mail nebo heslo',
+                notAuthorized: 'Není autorizováno',
+            },
+            sk: {
+                // Navigácia & Autentifikácia
+                login: 'Prihlásenie',
+                register: 'Vytvoriť účet',
+                logout: 'Odhlásenie',
+                email: 'E-mail',
+                password: 'Heslo',
+                fullName: 'Meno a priezvisko',
+                inviteCode: 'Kód pozvánky',
+                alreadyHaveAccount: 'Máte už účet?',
+                dontHaveAccount: 'Nemáte účet?',
+                loginHere: 'Prihláste sa tu',
+                registerHere: 'Zaregistrujte sa tu',
+                
+                // Palubná doska
+                myShifts: 'Moje zmeny',
+                availableShifts: 'Dostupné zmeny',
+                monthView: 'Mesačný prehľad',
+                settings: 'Nastavenia',
+                manageUsers: 'Správa používateľov',
+                inviteCodes: 'Kódy pozvánek',
+                createShift: 'Vytvoriť zmenu',
+                cancellationRequests: 'Požiadavky na zrušenie zmeny',
+                
+                // Zmeny
+                myRegisteredShifts: 'Moje registrované zmeny',
+                registeredShifts: 'Registrované zmeny',
+                availableShiftsTitle: 'Dostupné zmeny',
+                registered: 'Registrované',
+                cancellationPending: 'Zrušenie čaká na schválenie',
+                position: 'Pozícia',
+                slots: 'Pozície',
+                requestCancel: 'Požiadať o zrušenie',
+                pendingApproval: 'Čaká na schválenie',
+                registerForShift: 'Zaregistrovať sa',
+                unregister: 'Zrušiť registráciu',
+                
+                // Heslo
+                currentPassword: 'Aktuálne heslo',
+                newPassword: 'Nové heslo',
+                confirmPassword: 'Potvrdiť nové heslo',
+                changePassword: 'Zmeniť heslo',
+                changeYourPassword: 'Zmeniť vaše heslo',
+                resetUserPassword: 'Resetovať heslo používateľa',
+                selectUserToReset: '-- Vyberte používateľa na reset --',
+                resetPassword: 'Resetovať heslo',
+                resetPasswordDesc: 'Vyberte zamestnanca alebo manažéra, aby ste resetovali jeho heslo. Môžu si vytvoriť nové pri nasledujúcom prihlásení.',
+                changeYourPasswordDesc: 'Aktualizujte svoje heslo, aby ste udržali svoj účet v bezpečí.',
+                passwordChanged: '✅ Heslo úspešne zmenené!',
+                passwordResetFor: '✅ Heslo resetované pre {name}. Dočasné heslo: {password} (Mali by si to zmeniť pri prihlásení)',
+                passwordMustBeDifferent: 'Nové heslo sa musí líšiť od aktuálneho hesla',
+                passwordsDoNotMatch: 'Nové heslá sa nezhodujú',
+                passwordMinimum: 'Heslo musí mať najmenej 6 znakov',
+                currentPasswordIncorrect: 'Aktuálne heslo je nesprávne',
+                pleaseSelectUser: 'Vyberte používateľa',
+                userNotFound: 'Používateľ nenájdený',
+                fillAllFields: 'Prosím vyplňte všetky polia',
+                
+                // Správa používateľov
+                teamMembers: 'Členovia tímu',
+                owner: 'Majiteľ/Superadmin',
+                manager: 'Manažér',
+                employee: 'Zamestnanec',
+                changeRole: 'Zmeniť rolu',
+                deleteUser: 'Vymazať',
+                deleteUserConfirm: 'Vymazať {name}? Toto sa nedá vrátiť späť.',
+                userDeleted: 'Používateľ vymazaný',
+                deleteShift: 'Vymazať zmenu',
+                deleteShiftConfirm: 'Vymazať túto zmenu? Toto sa nedá vrátiť späť.',
+                editShift: 'Upraviť zmenu',
+                shiftDeleted: 'Zmena vymazaná',
+                roleUpdatedTo: 'Rola aktualizovaná na {role}',
+                
+                // Kódy pozvánek
+                generateNewInviteCode: 'Vygenerovať nový kód pozvánky',
+                generateCodes: 'Generovať kódy',
+                activeCodes: 'Aktívne kódy',
+                usedCodes: 'Použité kódy',
+                role: 'Rola',
+                created: 'Vytvorené',
+                usedBy: 'Použité používateľom',
+                usedOn: 'Použité dňa',
+                copy: 'Kopírovať',
+                revoke: 'Zrušiť',
+                revokeCode: 'Zrušiť tento kód pozvánky? Už nebude možné ho použiť.',
+                codesCopied: 'Kód pozvánky skopírovaný do schránky! ✓',
+                enterValidCodeCount: 'Zadajte medzi 1 a 50 kódov',
+                codesGenerated: 'Kódy boli úspešne vygenerované!',
+                
+                // Požiadavky na zrušenie
+                cancellationRequests: 'Požiadavky na zrušenie zmeny',
+                noCancellationRequests: 'Žiadne nevyčíslené požiadavky na zrušenie.',
+                approve: 'Schváliť',
+                reject: 'Odmietnuť',
+                requestedBy: 'Požiadal(a)',
+                shift: 'Zmena',
+                
+                // Správy
+                askOwnerSetup: 'Google Calendar ešte nie je nakonfigurovaný. Požiadajte majiteľa reštaurácie, aby ho nastavil.',
+                fillAllFieldsError: 'Prosím vyplňte všetky polia vrátane kódu pozvánky',
+                emailAlreadyRegistered: 'E-mail už registrovaný',
+                invalidExpiredCode: 'Neplatný alebo vypršaný kód pozvánky',
+                accountCreated: 'Účet vytvorený! Prosím prihláste sa.',
+                enterEmail: 'Prosím zadajte e-mail a heslo',
+                invalidLogin: 'Neplatný e-mail alebo heslo',
+                notAuthorized: 'Nie je autorizované',
+            }
+        };
+
+        // Language management
+        let currentLanguage = localStorage.getItem('appLanguage') || 'en';
+
+        function t(key, vars = {}) {
+            let text = translations[currentLanguage]?.[key] || translations['en'][key] || key;
+            // Replace variables like {name} with actual values
+            Object.keys(vars).forEach(varKey => {
+                text = text.replace(`{${varKey}}`, vars[varKey]);
+            });
+            return text;
+        }
+
+        function setLanguage(lang) {
+            currentLanguage = lang;
+            localStorage.setItem('appLanguage', lang);
+            updatePageLanguage();
+        }
+
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            const html = document.documentElement;
+            const isDarkMode = html.classList.contains('dark-mode');
+            
+            if (isDarkMode) {
+                html.classList.remove('dark-mode');
+                document.getElementById('themeToggle').textContent = '🌙';
+                localStorage.setItem('darkMode', 'false');
+            } else {
+                html.classList.add('dark-mode');
+                document.getElementById('themeToggle').textContent = '☀️';
+                localStorage.setItem('darkMode', 'true');
+            }
+        }
+
+        // Initialize dark mode from localStorage
+        function initializeDarkMode() {
+            const darkModePreference = localStorage.getItem('darkMode');
+            if (darkModePreference === 'true') {
+                document.documentElement.classList.add('dark-mode');
+                document.getElementById('themeToggle').textContent = '☀️';
+            } else {
+                document.documentElement.classList.remove('dark-mode');
+                document.getElementById('themeToggle').textContent = '🌙';
+            }
+        }
+
+        function updatePageLanguage() {
+            // Update all elements with data-i18n attribute
+            document.querySelectorAll('[data-i18n]').forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                el.textContent = t(key);
+            });
+
+            // Update all placeholders
+            document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+                const key = el.getAttribute('data-i18n-placeholder');
+                el.placeholder = t(key);
+            });
+
+            // Update all labels
+            document.querySelectorAll('[data-i18n-label]').forEach(el => {
+                const key = el.getAttribute('data-i18n-label');
+                el.textContent = t(key);
+            });
+
+            // Update main navigation buttons
+            const buttonUpdates = {
+                'btnUsers': 'manageUsers',
+                'btnInvites': 'inviteCodes',
+                'btnSettings': 'settings',
+                'btnMyShifts': 'myShifts',
+                'btnList': 'availableShifts',
+                'btnCalendarEmp': 'monthView',
+                'btnEmployeeSettings': 'settings',
+                'btnCreate': 'createShift',
+                'btnCalendar': 'monthView',
+                'btnRequests': 'cancellationRequests',
+            };
+
+            Object.keys(buttonUpdates).forEach(btnId => {
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    btn.textContent = t(buttonUpdates[btnId]);
+                }
+            });
+
+            // Update section headings dynamically
+            document.querySelectorAll('h3').forEach(heading => {
+                const text = heading.textContent.trim();
+                const translations = {
+                    'Team Members': 'teamMembers',
+                    'My Registered Shifts': 'myRegisteredShifts',
+                    'Available Shifts': 'availableShiftsTitle',
+                    'Change Your Password': 'changeYourPassword',
+                    'Reset User Password': 'resetUserPassword',
+                    'My Shifts': 'myShifts',
+                    'Settings': 'settings',
+                    'Generate New Invite Code': 'generateNewInviteCode',
+                };
+                
+                if (translations[text]) {
+                    heading.textContent = t(translations[text]);
+                }
+            });
+
+            // Update specific element IDs
+            if (document.getElementById('generateNewCodeHeading')) {
+                document.getElementById('generateNewCodeHeading').textContent = t('generateNewInviteCode');
+            }
+            if (document.getElementById('generateCodesBtn')) {
+                document.getElementById('generateCodesBtn').textContent = t('generateCodes');
+            }
+
+            // Update input placeholders
+            const placeholderUpdates = {
+                'currentPassword': 'currentPassword',
+                'newPassword': 'newPassword',
+                'confirmPassword': 'confirmPassword',
+                'empCurrentPassword': 'currentPassword',
+                'empNewPassword': 'newPassword',
+                'empConfirmPassword': 'confirmPassword',
+            };
+
+            Object.keys(placeholderUpdates).forEach(inputId => {
+                const input = document.getElementById(inputId);
+                if (input) {
+                    input.placeholder = t(placeholderUpdates[inputId]);
+                }
+            });
+
+            // Update language buttons styling
+            document.querySelectorAll('[data-lang-btn]').forEach(btn => {
+                const btnLang = btn.getAttribute('data-lang-btn');
+                if (btnLang === currentLanguage) {
+                    btn.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                    btn.style.color = 'white';
+                } else {
+                    btn.style.background = '#f0f0f0';
+                    btn.style.color = '#333';
+                }
+            });
+
+            // Re-render current view to update all dynamically generated text
+            if (currentUser) {
+                if (currentUser.role === 'superadmin') {
+                    toggleSuperadminView('users');
+                } else if (currentUser.role === 'manager') {
+                    toggleAdminView('create');
+                } else {
+                    toggleEmployeeView('myshifts');
+                }
+            }
+        }
+
+        
+        // Initialize app
+        let currentUser = null;
+        let currentEditShiftId = null;
+        let currentCalendarDate = new Date();
+        let currentEmployeeCalendarDate = new Date();
+
+        // Superadmin Management Functions
+        function toggleSuperadminView(view) {
+            const usersView = document.getElementById('usersView');
+            const invitesView = document.getElementById('invitesView');
+            const settingsView = document.getElementById('settingsView');
+            const btnUsers = document.getElementById('btnUsers');
+            const btnInvites = document.getElementById('btnInvites');
+            const btnSettings = document.getElementById('btnSettings');
+
+            usersView.style.display = 'none';
+            invitesView.style.display = 'none';
+            settingsView.style.display = 'none';
+
+            btnUsers.style.background = '#f0f0f0';
+            btnUsers.style.color = '#333';
+            btnInvites.style.background = '#f0f0f0';
+            btnInvites.style.color = '#333';
+            btnSettings.style.background = '#f0f0f0';
+            btnSettings.style.color = '#333';
+
+            if (view === 'users') {
+                usersView.style.display = 'block';
+                btnUsers.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnUsers.style.color = 'white';
+                displayUsers();
+            } else if (view === 'invites') {
+                invitesView.style.display = 'block';
+                btnInvites.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnInvites.style.color = 'white';
+                displayInviteCodes();
+            } else if (view === 'settings') {
+                settingsView.style.display = 'block';
+                btnSettings.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnSettings.style.color = 'white';
+                populateResetPasswordDropdown();
+                displayAllUsers();
+            }
+        }
+
+        function displayUsers() {
+            const users = getUsers();
+            const container = document.getElementById('usersContainer');
+
+            if (users.length === 0) {
+                container.innerHTML = `<div class="empty-state"><p>${t('fillAllFields')}</p></div>`;
+                return;
+            }
+
+            container.innerHTML = users.map(user => {
+                let roleClass = '';
+                let roleDisplay = '';
+                if (user.role === 'superadmin') {
+                    roleClass = 'role-superadmin';
+                    roleDisplay = t('owner');
+                } else if (user.role === 'manager') {
+                    roleClass = 'role-manager';
+                    roleDisplay = t('manager');
+                } else {
+                    roleClass = 'role-user';
+                    roleDisplay = t('employee');
+                }
+
+                return `
+                    <div class="user-card">
+                        <div class="user-info">
+                            <h4>${user.name}</h4>
+                            <p>${user.email}</p>
+                            <p style="margin-top: 6px;"><span class="user-role-badge ${roleClass}">${roleDisplay}</span></p>
+                        </div>
+                        <div class="user-actions">
+                            ${user.role !== 'superadmin' ? `<button type="button" class="btn-change-role" onclick="changeUserRole(${user.id}); return false;">${t('changeRole')}</button>` : ''}
+                            ${user.role !== 'superadmin' ? `<button type="button" class="btn-delete-user" onclick="deleteUser(${user.id}); return false;">${t('deleteUser')}</button>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function changeUserRole(userId) {const users = getUsers();
+            const user = users.find(u => u.id === userId);
+            if (!user) {showMessage(document.getElementById('dashboardMessage'), 'User not found', 'error');
+                return;
+            }
+
+            // Toggle between manager and user (employee)
+            const newRole = user.role === 'manager' ? 'user' : 'manager';
+            const roleDisplay = newRole === 'manager' ? t('manager') : t('employee');customConfirm('Change User Role', `Change ${user.name}'s role to ${roleDisplay}?`).then(confirmed => {if (confirmed) {user.role = newRole;
+                    saveUsers(users);showMessage(document.getElementById('dashboardMessage'), t('roleUpdatedTo', {role: roleDisplay}), 'success');displayUsers();} else {}
+            });
+        }
+
+        function deleteUser(userId) {const users = getUsers();
+            const user = users.find(u => u.id === userId);
+            
+            if (!user) {showMessage(document.getElementById('dashboardMessage'), 'User not found', 'error');
+                return;
+            }customConfirm('Delete User', `Delete ${user.name}? This cannot be undone.`).then(confirmed => {if (confirmed) {const updatedUsers = users.filter(u => u.id !== userId);
+                    saveUsers(updatedUsers);showMessage(document.getElementById('dashboardMessage'), t('userDeleted'), 'info');displayUsers();} else {}
+            });
+        }
+
+        function generateInviteCodes() {
+            const role = document.getElementById('inviteRole').value;
+            const count = parseInt(document.getElementById('inviteCount').value);
+
+            if (count < 1 || count > 50) {
+                showMessage(document.getElementById('dashboardMessage'), t('enterValidCodeCount'), 'error');
+                return;
+            }
+
+            const codes = getInviteCodes();
+            const newCodes = [];
+
+            for (let i = 0; i < count; i++) {
+                const code = 'REST-' + Math.random().toString(36).substr(2, 9).toUpperCase();
+                newCodes.push({
+                    id: Date.now() + i,
+                    code,
+                    role,
+                    used: false,
+                    createdAt: new Date().toISOString()
+                });
+            }
+
+            codes.push(...newCodes);
+            saveInviteCodes(codes);
+
+            showMessage(document.getElementById('dashboardMessage'), `${count} invite code(s) generated!`, 'success');
+            document.getElementById('inviteRole').value = 'manager';
+            document.getElementById('inviteCount').value = '1';
+            displayInviteCodes();
+        }
+
+        function displayInviteCodes() {
+            const codes = getInviteCodes();
+            const container = document.getElementById('invitesContainer');
+
+            if (codes.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No invite codes generated yet.</p>';
+                return;
+            }
+
+            const activeCodes = codes.filter(c => !c.used);
+            const usedCodes = codes.filter(c => c.used);
+
+            let html = '';
+            
+            if (activeCodes.length > 0) {
+                html += `<h4 style="color: #333; margin-bottom: 12px;">${t('activeCodes')}</h4>`;
+                html += activeCodes.map(code => `
+                    <div class="invite-code-card">
+                        <div class="code-info">
+                            <p><span class="code-value">${code.code}</span></p>
+                            <p><strong>${t('role')}:</strong> ${code.role === 'manager' ? t('manager') : t('employee')}</p>
+                            <p><strong>${t('created')}:</strong> ${new Date(code.createdAt).toLocaleDateString()}</p>
+                        </div>
+                        <div class="code-actions">
+                            <button type="button" class="btn-copy-code" onclick="copyToClipboard('${code.code}'); return false;">${t('copy')}</button>
+                            <button type="button" class="btn-revoke-code" onclick="revokeCode(${code.id}); return false;">${t('revoke')}</button>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            if (usedCodes.length > 0) {
+                html += `<h4 style="color: #333; margin-top: 20px; margin-bottom: 12px;">${t('usedCodes')}</h4>`;
+                html += usedCodes.map(code => `
+                    <div class="invite-code-card" style="background: #f0f0f0; border-color: #999; opacity: 0.7;">
+                        <div class="code-info">
+                            <p><span class="code-value">${code.code}</span></p>
+                            <p><strong>${t('usedBy')}:</strong> ${code.usedBy}</p>
+                            <p><strong>${t('usedOn')}:</strong> ${new Date(code.usedAt).toLocaleDateString()}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            container.innerHTML = html;
+        }
+
+        function copyToClipboard(text) {
+            // Try modern clipboard API first
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+                navigator.clipboard.writeText(text).then(function() {
+                    showMessage(document.getElementById('dashboardMessage'), 'Invite code copied to clipboard! ✓', 'success');
+                }).catch(function(err) {
+                    // Fallback for older browsers
+                    fallbackCopyToClipboard(text);
+                });
+            } else {
+                // Fallback for older browsers
+                fallbackCopyToClipboard(text);
+            }
+        }
+
+        function fallbackCopyToClipboard(text) {
+            // Create a temporary textarea element
+            const textarea = document.createElement('textarea');
+            textarea.value = text;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            
+            try {
+                textarea.select();
+                document.execCommand('copy');
+                showMessage(document.getElementById('dashboardMessage'), 'Invite code copied to clipboard! ✓', 'success');
+            } catch (err) {
+                showMessage(document.getElementById('dashboardMessage'), 'Failed to copy code. Please try again.', 'error');
+            } finally {
+                document.body.removeChild(textarea);
+            }
+        }
+
+        function revokeCode(codeId) {customConfirm('Revoke Invite Code', 'Revoke this invite code? It can no longer be used.').then(confirmed => {if (confirmed) {
+                    const codes = getInviteCodes();
+                    const code = codes.find(c => c.id === codeId);
+                    if (code) {code.used = true;
+                        code.revokedAt = new Date().toISOString();
+                        saveInviteCodes(codes);displayInviteCodes();} else {}
+                } else {}
+            });
+        }
+
+        // Password Reset Functions for Superadmin
+        function resetUserPassword() {const userId = document.getElementById('resetPasswordUser').value;
+            const select = document.getElementById('resetPasswordUser');
+            const selectedOption = select.options[select.selectedIndex];const messageEl = document.getElementById('resetPasswordMessage');
+
+            if (!userId) {showMessage(messageEl, 'Please select a user', 'error');
+                return;
+            }
+
+            const allUsers = getUsers(); // Get ALL users, don't filterconsole.log('Looking for user with ID:', userId, '(type:', typeof userId, ')');
+            
+            // Convert userId to number since IDs are stored as numbers
+            const userIdNum = parseInt(userId);// Find in ALL users (not filtered)
+            const user = allUsers.find(u => {
+                console.log(`Comparing: user.id=${u.id} (${u.name}) === userIdNum=${userIdNum} ? ${u.id === userIdNum}`);
+                return u.id === userIdNum;
+            });if (!user) {showMessage(messageEl, 'User not found', 'error');
+                return;
+            }customConfirm('Reset Password', `Reset password for ${user.name}? They will need to set a new password on next login.`).then(confirmed => {if (confirmed) {// Generate a temporary password
+                    const tempPassword = 'temp_' + Math.random().toString(36).substr(2, 9);
+                    user.password = tempPassword;
+                    user.passwordResetRequired = true;
+                    user.passwordResetAt = new Date().toISOString();
+                    
+                    saveUsers(allUsers);showMessage(messageEl, `✅ ${user.name} - Temporary password: ${tempPassword}`, 'success');
+                    populateResetPasswordDropdown();
+                } else {}
+            });
+        }
+
+        function displayAllUsers() {
+            const users = getUsers();
+            const container = document.getElementById('allUsersContainer');
+            
+            if (!container) {return;
+            }
+            
+            if (users.length === 0) {
+                container.innerHTML = '<p style="color: #999;">No users found</p>';
+                return;
+            }
+            
+            let html = '<table style="width: 100%; border-collapse: collapse;">';
+            html += '<thead style="background: #f5f5f5; font-weight: bold; border-bottom: 2px solid #e0e0e0;">';
+            html += '<tr><td style="padding: 10px; text-align: left;">ID</td><td style="padding: 10px;">Name</td><td style="padding: 10px;">Email</td><td style="padding: 10px;">Role</td></tr>';
+            html += '</thead><tbody>';
+            
+            users.forEach((user, index) => {
+                const bgColor = index % 2 === 0 ? '#ffffff' : '#f9f9f9';
+                html += `<tr style="border-bottom: 1px solid #e0e0e0; background: ${bgColor};">`;
+                html += `<td style="padding: 10px; text-align: left;"><strong>${user.id}</strong></td>`;
+                html += `<td style="padding: 10px;">${user.name}</td>`;
+                html += `<td style="padding: 10px; font-size: 12px;">${user.email}</td>`;
+                html += `<td style="padding: 10px;"><span style="padding: 4px 8px; border-radius: 4px; background: ${user.role === 'superadmin' ? '#c41e3a' : user.role === 'manager' ? '#1a1a1a' : '#666'}; color: white; font-size: 12px; font-weight: bold;">${user.role.toUpperCase()}</span></td>`;
+                html += '</tr>';
+            });
+            
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+        
+        function populateResetPasswordDropdown() {const allUsers = getUsers();const users = allUsers.filter(u => u.role !== 'superadmin'); // Don't allow resetting superadmin in dropdown
+            console.log('Filtered users (excluding superadmin):', users);
+            console.log('User IDs:', users.map(u => ({ name: u.name, id: u.id, role: u.role })));
+            
+            const select = document.getElementById('resetPasswordUser');
+            
+            if (!select) {return;
+            }
+            
+            const options = users.map(user => {return `<option value="${user.id}">${user.name} (${user.email})</option>`;
+            }).join('');
+            
+            select.innerHTML = '<option value="">-- Select User to Reset --</option>' + options;}
+
+        function changeSuperadminPassword() {
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const messageEl = document.getElementById('changePasswordMessage');
+
+            // Validation
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showMessage(messageEl, 'Please fill all fields', 'error');
+                return;
+            }
+
+            if (currentPassword === newPassword) {
+                showMessage(messageEl, 'New password must be different from current password', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showMessage(messageEl, 'New passwords do not match', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showMessage(messageEl, 'Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            // Verify current password
+            if (currentUser.password !== currentPassword) {
+                showMessage(messageEl, 'Current password is incorrect', 'error');
+                return;
+            }
+
+            // Update password
+            const users = getUsers();
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            
+            if (userIndex !== -1) {
+                users[userIndex].password = newPassword;
+                users[userIndex].passwordChangedAt = new Date().toISOString();
+                saveUsers(users);
+                currentUser = users[userIndex];
+
+                showMessage(messageEl, '✅ Password changed successfully!', 'success');
+                
+                // Clear the form
+                document.getElementById('currentPassword').value = '';
+                document.getElementById('newPassword').value = '';
+                document.getElementById('confirmPassword').value = '';
+            }
+        }
+
+        function changeEmployeePassword() {
+            const currentPassword = document.getElementById('empCurrentPassword').value;
+            const newPassword = document.getElementById('empNewPassword').value;
+            const confirmPassword = document.getElementById('empConfirmPassword').value;
+            const messageEl = document.getElementById('empChangePasswordMessage');
+
+            // Validation
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showMessage(messageEl, 'Please fill all fields', 'error');
+                return;
+            }
+
+            if (currentPassword === newPassword) {
+                showMessage(messageEl, 'New password must be different from current password', 'error');
+                return;
+            }
+
+            if (newPassword !== confirmPassword) {
+                showMessage(messageEl, 'New passwords do not match', 'error');
+                return;
+            }
+
+            if (newPassword.length < 6) {
+                showMessage(messageEl, 'Password must be at least 6 characters', 'error');
+                return;
+            }
+
+            // Verify current password
+            if (currentUser.password !== currentPassword) {
+                showMessage(messageEl, 'Current password is incorrect', 'error');
+                return;
+            }
+
+            // Update password
+            const users = getUsers();
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            
+            if (userIndex !== -1) {
+                users[userIndex].password = newPassword;
+                users[userIndex].passwordChangedAt = new Date().toISOString();
+                saveUsers(users);
+                currentUser = users[userIndex];
+
+                showMessage(messageEl, '✅ Password changed successfully!', 'success');
+                
+                // Clear the form
+                document.getElementById('empCurrentPassword').value = '';
+                document.getElementById('empNewPassword').value = '';
+                document.getElementById('empConfirmPassword').value = '';
+            }
+        }
+function handleGoogleCallbackToken(token) {
+            const users = getUsers();
+            const userIndex = users.findIndex(u => u.id === currentUser.id);
+            
+            if (userIndex !== -1) {
+                users[userIndex].googleAccessToken = token;
+                users[userIndex].googleCalendarConnected = true;
+                users[userIndex].googleTokenObtainedAt = new Date().toISOString();
+                saveUsers(users);
+                currentUser = users[userIndex];
+                
+                showMessage(document.getElementById('dashboardMessage'), 'Google Calendar connected successfully!', 'success');
+                displayMyShifts();
+            }
+        }
+
+        function displayCancellationRequests() {
+            const requests = getCancellationRequests().filter(r => r.status === 'pending');
+            const users = getUsers();
+            const container = document.getElementById('requestsContainer');
+
+            if (requests.length === 0) {
+                container.innerHTML = '<div class="empty-requests"><p>No pending cancellation requests.</p></div>';
+                return;
+            }
+
+            container.innerHTML = requests.map(request => {
+                const employee = users.find(u => u.id === request.userId);
+                const date = new Date(request.shiftDate);
+                const dateDisplay = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+                return `
+                    <div class="request-card">
+                        <div class="request-info">
+                            <h4>${employee?.name || 'Unknown Employee'} - ${request.shiftPosition}</h4>
+                            <p><strong>Date:</strong> ${dateDisplay}</p>
+                            <p><strong>Time:</strong> ${request.shiftTime}</p>
+                            <p><strong>Requested:</strong> ${new Date(request.requestedAt).toLocaleString()}</p>
+                        </div>
+                        <div class="request-actions">
+                            <button class="btn-approve" onclick="approveRequest(${request.id})">Approve</button>
+                            <button class="btn-reject" onclick="rejectRequest(${request.id})">Reject</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function approveRequest(requestId) {
+            const requests = getCancellationRequests();
+            const request = requests.find(r => r.id === requestId);
+
+            if (request) {
+                // Remove the registration
+                const registrations = getRegistrations();
+                saveRegistrations(registrations.filter(r => !(r.shiftId === request.shiftId && r.userId === request.userId)));
+
+                // Mark request as approved
+                request.status = 'approved';
+                request.approvedAt = new Date().toISOString();
+                saveCancellationRequests(requests);
+
+                showMessage(document.getElementById('dashboardMessage'), 'Cancellation request approved. Registration removed.', 'success');
+                displayCancellationRequests();
+                displayShifts();
+            }
+        }
+
+        function rejectRequest(requestId) {
+            const requests = getCancellationRequests();
+            const request = requests.find(r => r.id === requestId);
+
+            if (request) {
+                // Mark request as rejected
+                request.status = 'rejected';
+                request.rejectedAt = new Date().toISOString();
+                saveCancellationRequests(requests);
+
+                showMessage(document.getElementById('dashboardMessage'), 'Cancellation request rejected.', 'info');
+                displayCancellationRequests();
+            }
+        }
+
+        function displayMyShifts() {
+            const registrations = getRegistrations().filter(r => r.userId === currentUser.id);
+            const shifts = getShifts();
+            const cancellationRequests = getCancellationRequests();
+            const container = document.getElementById('myShiftsContainer');
+
+            // Get shifts the user is registered for
+            const myShifts = shifts
+                .filter(shift => registrations.some(r => r.shiftId === shift.id))
+                .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+            if (myShifts.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>You haven\'t registered for any shifts yet.</p></div>';
+                return;
+            }
+
+            container.innerHTML = myShifts.map(shift => {
+                const date = new Date(shift.date);
+                const dateStr = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                
+                const pendingRequest = cancellationRequests.find(r => r.shiftId === shift.id && r.userId === currentUser.id && r.status === 'pending');
+                const shiftStatus = pendingRequest ? t('cancellationPending') : t('registered');
+                const shiftStatusClass = pendingRequest ? 'status-full' : 'status-registered';
+
+                return `
+                    <div class="shift-card registered">
+                        <div class="shift-date">${dateStr}</div>
+                        <div class="shift-time">${shift.startTime} - ${shift.endTime}</div>
+                        <div class="shift-status ${shiftStatusClass}">${shiftStatus}</div>
+                        <div class="shift-info">
+                            <div><strong>${t('position')}:</strong> ${shift.position}</div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; gap: 8px;">
+                            ${!pendingRequest ? `
+                                <button class="btn-unregister" onclick="unregisterShift(${shift.id}); toggleEmployeeView('myshifts');" style="width: 100%;">Request Cancel</button>
+                            ` : `<button class="btn-unregister" onclick="alert('You have a pending cancellation request for this shift.')" style="width: 100%;">Pending Approval</button>`}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Sync data with server (Netlify Blobs) and use localStorage as cache
+        // Sync polling - check for updates from other users every 5 seconds
+        let lastSyncTimestamp = 0;
+        let syncInterval = null;
+        let isSyncing = false;
+
+        async function pollForUpdates() {
+            if (isSyncing || !currentUser) return;
+            
+            try {
+                isSyncing = true;
+                const response = await fetch('/api/data');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    const newTimestamp = Date.now();
+                    
+                    // Check if data has changed
+                    const currentUsers = JSON.stringify(getUsers());
+                    const newUsers = JSON.stringify(data.users || []);
+                    
+                    if (currentUsers !== newUsers) {localStorage.setItem('users', newUsers);
+                        localStorage.setItem('shifts', JSON.stringify(data.shifts || []));
+                        localStorage.setItem('registrations', JSON.stringify(data.registrations || []));
+                        localStorage.setItem('cancellationRequests', JSON.stringify(data.cancellationRequests || []));
+                        localStorage.setItem('inviteCodes', JSON.stringify(data.inviteCodes || []));
+                        
+                        // Refresh current view without losing user's position
+                        refreshCurrentView();
+                        showNotification('✅ Updated with latest data from other users');
+                    }
+                    
+                    lastSyncTimestamp = newTimestamp;
+                }
+            } catch (err) {
+                console.warn('Poll error:', err);
+            } finally {
+                isSyncing = false;
+            }
+        }
+
+        // Sync data with server (Netlify Blobs)
+        async function syncToServer(storeName, data) {
+            try {
+                const response = await fetch('/api/data/' + storeName, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                if (!response.ok) {
+                    console.error('Sync error for ' + storeName + ':', response.status);
+                    showNotification('⚠️ Failed to sync to server', 'error');
+                    return;
+                }showNotification('✅ Changes saved', 'success');
+                
+                // Trigger immediate poll to get updates
+                setTimeout(pollForUpdates, 500);
+            } catch (err) {
+                console.error('Sync error for ' + storeName + ':', err);
+                showNotification('⚠️ Connection error', 'error');
+            }
+        }
+
+        // Show notification toast
+        function showNotification(msg, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 60px;
+                right: 10px;
+                background: ${type === 'error' ? '#e74c3c' : type === 'success' ? '#2ecc71' : '#3498db'};
+                color: white;
+                padding: 12px 16px;
+                border-radius: 6px;
+                font-size: 13px;
+                z-index: 1000;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+            `;
+            notification.textContent = msg;
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            }, 3000);
+        }
+
+        // Refresh current view (smart refresh that doesn't lose state)
+        function refreshCurrentView() {
+            const activeView = document.querySelector('.section.active');
+            if (!activeView) return;
+            
+            if (currentUser.role === 'superadmin') {
+                const activeTab = document.querySelector('[id^="btn"][style*="gradient"]');
+                if (activeTab?.id === 'btnUsers') displayUsers();
+                else if (activeTab?.id === 'btnInvites') displayInviteCodes();
+            } else if (currentUser.role === 'manager') {
+                const activeTab = document.querySelector('[id^="btn"][style*="gradient"]');
+                if (activeTab?.id === 'btnCreateShift') displayShifts();
+                else if (activeTab?.id === 'btnMonthly') displayMonthlyOverview();
+            } else {
+                const activeTab = document.querySelector('[id^="btn"][style*="gradient"]');
+                if (activeTab?.id === 'btnMyShifts') displayMyShifts();
+                else if (activeTab?.id === 'btnList') displayShiftsList();
+            }
+        }
+
+        function getUsers() { return JSON.parse(localStorage.getItem('users') || '[]'); }
+        function getShifts() { return JSON.parse(localStorage.getItem('shifts') || '[]'); }
+        function getRegistrations() { return JSON.parse(localStorage.getItem('registrations') || '[]'); }
+        function getCancellationRequests() { return JSON.parse(localStorage.getItem('cancellationRequests') || '[]'); }
+        function saveUsers(u) { localStorage.setItem('users', JSON.stringify(u)); syncToServer('users', u); }
+        function saveShifts(s) { localStorage.setItem('shifts', JSON.stringify(s)); syncToServer('shifts', s); }
+        function saveRegistrations(r) { localStorage.setItem('registrations', JSON.stringify(r)); syncToServer('registrations', r); }
+        function saveCancellationRequests(r) { localStorage.setItem('cancellationRequests', JSON.stringify(r)); syncToServer('cancellationRequests', r); }
+
+        // Auth
+        function toggleForms() {
+            document.getElementById('loginSection').classList.toggle('active');
+            document.getElementById('registerSection').classList.toggle('active');
+        }
+
+        function register() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const inviteCode = document.getElementById('registerInviteCode').value;
+            const messageEl = document.getElementById('registerMessage');
+
+            if (!name || !email || !password || !inviteCode) {
+                showMessage(messageEl, 'Please fill all fields including invite code', 'error');
+                return;
+            }
+
+            const users = getUsers();
+            if (users.find(u => u.email === email)) {
+                showMessage(messageEl, 'Email already registered', 'error');
+                return;
+            }
+
+            // Validate invite code
+            const codes = getInviteCodes();
+            const validCode = codes.find(c => c.code === inviteCode && c.used === false);
+            
+            if (!validCode) {
+                showMessage(messageEl, 'Invalid or expired invite code', 'error');
+                return;
+            }
+
+            // Determine role based on invite code
+            const role = validCode.role;
+
+            // Create user with Google Calendar integration support
+            users.push({ 
+                id: Date.now(), 
+                name, 
+                email, 
+                password, 
+                role,
+                googleCalendarId: null,
+                googleCalendarConnected: false,
+                createdAt: new Date().toISOString()
+            });
+            saveUsers(users);
+
+            // Mark code as used
+            validCode.used = true;
+            validCode.usedBy = email;
+            validCode.usedAt = new Date().toISOString();
+            saveInviteCodes(codes);
+
+            showMessage(messageEl, 'Account created! Please login.', 'success');
+
+            setTimeout(() => {
+                document.getElementById('registerName').value = '';
+                document.getElementById('registerEmail').value = '';
+                document.getElementById('registerPassword').value = '';
+                document.getElementById('registerInviteCode').value = '';
+                toggleForms();
+            }, 1500);
+        }
+
+        function login() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            const messageEl = document.getElementById('loginMessage');
+
+            if (!email || !password) {
+                showMessage(messageEl, 'Please enter email and password', 'error');
+                return;
+            }
+
+            const user = getUsers().find(u => u.email === email && u.password === password);
+            if (!user) {
+                showMessage(messageEl, 'Invalid email or password', 'error');
+                return;
+            }
+
+            currentUser = user;
+            showDashboard();
+        }
+
+        function logout() {
+            // Stop sync polling
+            if (syncInterval) {
+                clearInterval(syncInterval);
+                syncInterval = null;
+            }
+            
+            currentUser = null;
+            localStorage.removeItem('currentUser');
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+            document.getElementById('bottomNav').style.display = 'none';
+            showLoginSection();
+        }
+
+        function showLoginSection() {
+            document.getElementById('dashboardSection').classList.remove('active');
+            document.getElementById('loginSection').classList.add('active');
+            document.getElementById('registerSection').classList.remove('active');
+        }
+
+        function showMessage(el, msg, type) {
+            const messageId = 'msg-' + Date.now();
+            el.innerHTML = `
+                <div class="message ${type}" id="${messageId}">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span>${msg}</span>
+                        <button onclick="document.getElementById('${messageId}').remove()" style="background: none; border: none; color: inherit; cursor: pointer; font-size: 18px; padding: 0; margin-left: 10px;">×</button>
+                    </div>
+                </div>
+            `;
+            setTimeout(() => { 
+                const el = document.getElementById(messageId);
+                if (el) el.remove();
+            }, 30000);
+        }
+
+        function showDashboard() {
+            document.getElementById('loginSection').classList.remove('active');
+            document.getElementById('registerSection').classList.remove('active');
+            document.getElementById('dashboardSection').classList.add('active');
+
+            const initials = currentUser.name.split(' ').map(n => n[0]).join('').toUpperCase();
+            document.getElementById('userAvatar').textContent = initials;
+            document.getElementById('userName').textContent = currentUser.name;
+            
+            let roleDisplay = '';
+            if (currentUser.role === 'superadmin') roleDisplay = t('owner');
+            else if (currentUser.role === 'manager') roleDisplay = t('manager');
+            else roleDisplay = t('employee');
+            document.getElementById('userRole').textContent = roleDisplay;
+
+            // Hide all admin sections
+            document.getElementById('adminSection').style.display = 'none';
+            document.getElementById('superadminSection').style.display = 'none';
+
+            // Show bottom nav on mobile and start sync polling
+            const bottomNav = document.getElementById('bottomNav');
+            if (window.innerWidth <= 480) {
+                bottomNav.style.display = 'flex';
+            }
+
+            // Start real-time sync polling (every 5 seconds)
+            if (!syncInterval) {
+                syncInterval = setInterval(pollForUpdates, 5000);
+            }
+
+            if (currentUser.role === 'superadmin') {
+                document.getElementById('superadminSection').style.display = 'block';
+                toggleSuperadminView('users');
+            } else if (currentUser.role === 'manager') {
+                document.getElementById('adminSection').style.display = 'block';
+                toggleAdminView('create');
+            } else {
+                toggleEmployeeView('myshifts');
+            }
+
+            displayShifts();
+            updatePageLanguage();
+        }
+
+        function updateBottomNav(view) {
+            document.querySelectorAll('.bottom-nav button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            const navBtn = document.getElementById('nav' + view.charAt(0).toUpperCase() + view.slice(1));
+            if (navBtn) navBtn.classList.add('active');
+        }
+
+        // Handle window resize for bottom nav
+        window.addEventListener('resize', function() {
+            const bottomNav = document.getElementById('bottomNav');
+            if (bottomNav && currentUser) {
+                if (window.innerWidth <= 480) {
+                    bottomNav.style.display = 'flex';
+                } else {
+                    bottomNav.style.display = 'none';
+                }
+            }
+        });
+
+        // Clean up polling on logout
+        window.addEventListener('beforeunload', function() {
+            if (syncInterval) clearInterval(syncInterval);
+        });
+
+        // Handle online/offline
+        window.addEventListener('online', function() {
+            showNotification('✅ Connection restored', 'success');
+            pollForUpdates();
+        });
+
+        window.addEventListener('offline', function() {
+            showNotification('⚠️ You are offline', 'error');
+        });
+
+        // Admin views
+        function toggleAdminView(view) {
+            const createView = document.getElementById('createShiftView');
+            const calendarView = document.getElementById('calendarView');
+            const requestsView = document.getElementById('requestsView');
+            const btnCreate = document.getElementById('btnCreate');
+            const btnCalendar = document.getElementById('btnCalendar');
+            const btnRequests = document.getElementById('btnRequests');
+
+            // Hide all views
+            createView.style.display = 'none';
+            calendarView.style.display = 'none';
+            requestsView.style.display = 'none';
+
+            // Reset all buttons
+            btnCreate.style.background = '#f0f0f0';
+            btnCreate.style.color = '#333';
+            btnCalendar.style.background = '#f0f0f0';
+            btnCalendar.style.color = '#333';
+            btnRequests.style.background = '#f0f0f0';
+            btnRequests.style.color = '#333';
+
+            // Show selected view and highlight button
+            if (view === 'create') {
+                createView.style.display = 'block';
+                btnCreate.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnCreate.style.color = 'white';
+                initializeDaySelector();
+            } else if (view === 'calendar') {
+                calendarView.style.display = 'block';
+                btnCalendar.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnCalendar.style.color = 'white';
+                renderCalendar();
+            } else if (view === 'requests') {
+                requestsView.style.display = 'block';
+                btnRequests.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnRequests.style.color = 'white';
+                displayCancellationRequests();
+            }
+        }
+
+        function toggleEmployeeView(view) {
+            const myShiftsView = document.getElementById('myShiftsView');
+            const listView = document.getElementById('listView');
+            const calendarViewEmp = document.getElementById('calendarViewEmp');
+            const employeeSettingsView = document.getElementById('employeeSettingsView');
+            const btnMyShifts = document.getElementById('btnMyShifts');
+            const btnList = document.getElementById('btnList');
+            const btnCalendarEmp = document.getElementById('btnCalendarEmp');
+            const btnEmployeeSettings = document.getElementById('btnEmployeeSettings');
+
+            // Hide all views
+            myShiftsView.style.display = 'none';
+            listView.style.display = 'none';
+            calendarViewEmp.style.display = 'none';
+            employeeSettingsView.style.display = 'none';
+
+            // Reset all buttons
+            btnMyShifts.style.background = '#f0f0f0';
+            btnMyShifts.style.color = '#333';
+            btnList.style.background = '#f0f0f0';
+            btnList.style.color = '#333';
+            btnCalendarEmp.style.background = '#f0f0f0';
+            btnCalendarEmp.style.color = '#333';
+            btnEmployeeSettings.style.background = '#f0f0f0';
+            btnEmployeeSettings.style.color = '#333';
+
+            // Show selected view and highlight button
+            if (view === 'myshifts') {
+                myShiftsView.style.display = 'block';
+                btnMyShifts.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnMyShifts.style.color = 'white';
+                displayMyShifts();
+            } else if (view === 'list') {
+                listView.style.display = 'block';
+                btnList.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnList.style.color = 'white';
+            } else if (view === 'calendar') {
+                calendarViewEmp.style.display = 'block';
+                btnCalendarEmp.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnCalendarEmp.style.color = 'white';
+                renderEmployeeCalendar();
+            } else if (view === 'settings') {
+                employeeSettingsView.style.display = 'block';
+                btnEmployeeSettings.style.background = 'linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%)';
+                btnEmployeeSettings.style.color = 'white';
+            }
+        }
+
+        // Admin calendar
+        function renderCalendar() {
+            const year = currentCalendarDate.getFullYear();
+            const month = currentCalendarDate.getMonth();
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('monthYear').textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let html = '<div class="calendar-grid">';
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+                html += `<div class="calendar-weekday">${day}</div>`;
+            });
+
+            for (let i = 0; i < firstDay; i++) html += '<div class="calendar-day other-month"></div>';
+
+            const shifts = getShifts();
+            const today = new Date();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currentDay = new Date(year, month, day);
+                const dateStr = currentDay.toISOString().split('T')[0];
+                const dayShifts = shifts.filter(s => s.date === dateStr);
+                const isToday = currentDay.toDateString() === today.toDateString();
+
+                html += `<div class="calendar-day${isToday ? ' today' : ''}" onclick="showDayModal('${dateStr}')">
+                    <div class="calendar-day-number">${day}</div>
+                    <div class="calendar-shifts">`;
+
+                dayShifts.forEach(shift => {
+                    const registered = getRegistrations().filter(r => r.shiftId === shift.id).length;
+                    html += `<div class="calendar-shift${registered >= shift.slots ? ' full' : ''}">${shift.position}</div>`;
+                });
+
+                html += '</div></div>';
+            }
+
+            const totalCells = firstDay + daysInMonth;
+            const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+            for (let i = 0; i < remainingCells; i++) html += '<div class="calendar-day other-month"></div>';
+
+            html += '</div>';
+            document.getElementById('calendarContainer').innerHTML = html;
+        }
+
+        function previousMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
+            renderCalendar();
+        }
+
+        function nextMonth() {
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + 1);
+            renderCalendar();
+        }
+
+        function showDayModal(dateStr) {
+            const shifts = getShifts().filter(s => s.date === dateStr);
+            const registrations = getRegistrations();
+            const users = getUsers();
+
+            const date = new Date(dateStr);
+            const dateDisplay = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            document.getElementById('dayModalTitle').textContent = `Shifts for ${dateDisplay}`;
+
+            let content = '';
+            if (shifts.length === 0) {
+                content = '<p style="color: #999; text-align: center; padding: 20px;">No shifts scheduled for this day.</p>';
+            } else {
+                shifts.forEach(shift => {
+                    const shiftReg = registrations.filter(r => r.shiftId === shift.id);
+                    const regUsers = shiftReg.map(r => users.find(u => u.id === r.userId)?.name || 'Unknown');
+
+                    content += `
+                        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 6px;">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 10px;">
+                                ${shift.startTime} - ${shift.endTime} • ${shift.position}
+                            </div>
+                            <div style="font-size: 13px; color: #666; margin-bottom: 10px;">
+                                ${shiftReg.length}/${shift.slots} slots filled
+                            </div>
+                            <div style="margin-bottom: 10px;">
+                                ${regUsers.length > 0 ? regUsers.map(n => `<div class="registered-employee">${n}</div>`).join('') : '<p style="color: #999; font-size: 12px;">No registrations yet</p>'}
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                <button type="button" class="btn btn-small" onclick="openEditModal(${shift.id}); closeDayModal(); return false;" style="background: #ffc107; color: #333; flex: 1;">${t('editShift')}</button>
+                                <button type="button" class="btn btn-small" onclick="deleteShift(${shift.id}); closeDayModal(); return false;" style="background: #c41e3a; color: white; flex: 1;">${t('deleteShift')}</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('dayModalContent').innerHTML = content;
+            document.getElementById('dayModal').classList.add('show');
+        }
+
+        function closeDayModal() {
+            document.getElementById('dayModal').classList.remove('show');
+        }
+
+        // Employee calendar
+        function renderEmployeeCalendar() {
+            const year = currentEmployeeCalendarDate.getFullYear();
+            const month = currentEmployeeCalendarDate.getMonth();
+            const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            document.getElementById('monthYearEmp').textContent = `${monthNames[month]} ${year}`;
+
+            const firstDay = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+            let html = '<div class="calendar-grid">';
+            ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].forEach(day => {
+                html += `<div class="calendar-weekday">${day}</div>`;
+            });
+
+            for (let i = 0; i < firstDay; i++) html += '<div class="calendar-day other-month"></div>';
+
+            const shifts = getShifts();
+            const registrations = getRegistrations();
+            const today = new Date();
+
+            for (let day = 1; day <= daysInMonth; day++) {
+                const currentDay = new Date(year, month, day);
+                const dateStr = currentDay.toISOString().split('T')[0];
+                const dayShifts = shifts.filter(s => s.date === dateStr);
+                const isToday = currentDay.toDateString() === today.toDateString();
+
+                html += `<div class="calendar-day${isToday ? ' today' : ''}" onclick="showEmployeeDayModal('${dateStr}')">
+                    <div class="calendar-day-number">${day}</div>
+                    <div class="calendar-shifts">`;
+
+                dayShifts.forEach(shift => {
+                    const registered = registrations.filter(r => r.shiftId === shift.id).length;
+                    const userRegistered = registrations.some(r => r.shiftId === shift.id && r.userId === currentUser.id);
+                    const isFull = registered >= shift.slots;
+                    
+                    let shiftClass = 'calendar-shift';
+                    if (isFull || userRegistered) shiftClass += ' full';
+                    
+                    html += `<div class="${shiftClass}">${shift.position}</div>`;
+                });
+
+                html += '</div></div>';
+            }
+
+            const totalCells = firstDay + daysInMonth;
+            const remainingCells = totalCells % 7 === 0 ? 0 : 7 - (totalCells % 7);
+            for (let i = 0; i < remainingCells; i++) html += '<div class="calendar-day other-month"></div>';
+
+            html += '</div>';
+            document.getElementById('calendarContainerEmp').innerHTML = html;
+        }
+
+        function previousMonthEmployee() {
+            currentEmployeeCalendarDate.setMonth(currentEmployeeCalendarDate.getMonth() - 1);
+            renderEmployeeCalendar();
+        }
+
+        function nextMonthEmployee() {
+            currentEmployeeCalendarDate.setMonth(currentEmployeeCalendarDate.getMonth() + 1);
+            renderEmployeeCalendar();
+        }
+
+        function showEmployeeDayModal(dateStr) {
+            const shifts = getShifts().filter(s => s.date === dateStr);
+            const registrations = getRegistrations();
+
+            const date = new Date(dateStr);
+            const dateDisplay = date.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' });
+            document.getElementById('dayModalTitle').textContent = `Shifts for ${dateDisplay}`;
+
+            let content = '';
+            if (shifts.length === 0) {
+                content = '<p style="color: #999; text-align: center; padding: 20px;">No shifts scheduled for this day.</p>';
+            } else {
+                shifts.forEach(shift => {
+                    const shiftReg = registrations.filter(r => r.shiftId === shift.id);
+                    const userRegistered = shiftReg.some(r => r.userId === currentUser.id);
+                    const available = shiftReg.length < shift.slots;
+                    
+                    let statusClass = available ? 'status-available' : 'status-full';
+                    let statusText = available ? 'Available' : 'Full';
+                    if (userRegistered) {
+                        statusClass = 'status-registered';
+                        statusText = 'You registered';
+                    }
+
+                    content += `
+                        <div style="margin-bottom: 20px; padding: 15px; border: 1px solid #e0e0e0; border-radius: 6px;">
+                            <div style="font-weight: 600; color: #333; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center;">
+                                <span>${shift.startTime} - ${shift.endTime} • ${shift.position}</span>
+                                <span class="shift-status ${statusClass}" style="font-size: 11px;">${statusText}</span>
+                            </div>
+                            <div style="font-size: 13px; color: #666; margin-bottom: 15px;">
+                                ${shiftReg.length}/${shift.slots} slots filled
+                            </div>
+                            <div style="display: flex; gap: 8px;">
+                                ${userRegistered ? 
+                                    `<button class="btn btn-small" onclick="unregisterShift(${shift.id}); closeDayModal();" style="background: #f0f0f0; color: #333; flex: 1;">Unregister</button>` 
+                                    : (available ? 
+                                    `<button class="btn btn-small" onclick="registerShift(${shift.id}); closeDayModal();" style="background: linear-gradient(135deg, #c41e3a 0%, #1a1a1a 100%); color: white; flex: 1;">Register</button>`
+                                    : '<span style="text-align: center; color: #999; font-size: 12px;">No slots available</span>')
+                                }
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+
+            document.getElementById('dayModalContent').innerHTML = content;
+            document.getElementById('dayModal').classList.add('show');
+        }
+
+        // Shifts
+        // Global variable for selected days in bulk creation
+        let selectedDaysForBulk = new Set();
+
+        // Initialize day selector on first admin view
+        function initializeDaySelector() {
+            const daySelector = document.getElementById('daySelector');
+            if (!daySelector || daySelector.children.length > 0) return; // Already initialized
+            
+            const daysOfWeek = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+            const shortDays = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            
+            daySelector.innerHTML = daysOfWeek.map((day, idx) => `
+                <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: white; border-radius: 6px; border: 2px solid #e0e0e0; cursor: pointer;">
+                    <input type="checkbox" data-day="${idx}" onchange="updateSelectedDays()" style="width: 18px; height: 18px; cursor: pointer;">
+                    <span>${day}</span>
+                </label>
+            `).join('');
+        }
+
+        function updateSelectedDays() {
+            selectedDaysForBulk.clear();
+            document.querySelectorAll('#daySelector input:checked').forEach(checkbox => {
+                selectedDaysForBulk.add(parseInt(checkbox.dataset.day));
+            });
+            document.getElementById('selectedDayCount').textContent = selectedDaysForBulk.size;
+        }
+
+        function toggleSelectAllDays() {
+            document.querySelectorAll('#daySelector input').forEach(checkbox => {
+                checkbox.checked = true;
+            });
+            updateSelectedDays();
+        }
+
+        function toggleClearAllDays() {
+            document.querySelectorAll('#daySelector input').forEach(checkbox => {
+                checkbox.checked = false;
+            });
+            updateSelectedDays();
+        }
+
+        function populateFromDateRange() {
+            const startDateStr = document.getElementById('rangeStartDate').value;
+            const endDateStr = document.getElementById('rangeEndDate').value;
+            
+            if (!startDateStr || !endDateStr) {
+                showNotification('Please select both start and end dates', 'error');
+                return;
+            }
+
+            const startDate = new Date(startDateStr);
+            const endDate = new Date(endDateStr);
+
+            if (startDate > endDate) {
+                showNotification('Start date must be before end date', 'error');
+                return;
+            }
+
+            selectedDaysForBulk.clear();
+            const currentDate = new Date(startDate);
+            
+            while (currentDate <= endDate) {
+                selectedDaysForBulk.add(currentDate.getDay() === 0 ? 6 : currentDate.getDay() - 1); // Convert to 0=Mon
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            // Update checkboxes
+            document.querySelectorAll('#daySelector input').forEach(checkbox => {
+                checkbox.checked = selectedDaysForBulk.has(parseInt(checkbox.dataset.day));
+            });
+
+            document.getElementById('selectedDayCount').textContent = selectedDaysForBulk.size;
+            showNotification(`Selected ${selectedDaysForBulk.size} days from range`, 'success');
+        }
+
+        function createBulkShifts() {
+            const startTime = document.getElementById('shiftStartTime').value;
+            const endTime = document.getElementById('shiftEndTime').value;
+            const slots = parseInt(document.getElementById('shiftSlots').value);
+            const position = document.getElementById('shiftPosition').value;
+
+            if (!startTime || !endTime || !position) {
+                showNotification('Please fill in all shift details', 'error');
+                return;
+            }
+
+            if (selectedDaysForBulk.size === 0) {
+                showNotification('Please select at least one day', 'error');
+                return;
+            }
+
+            // Calculate the next 12 weeks to cover
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const endDate = new Date(today);
+            endDate.setDate(endDate.getDate() + 84); // 12 weeks
+
+            const shifts = getShifts();
+            let shiftCount = 0;
+
+            // Generate shifts for each day of the week
+            const currentDate = new Date(today);
+            while (currentDate <= endDate) {
+                const dayOfWeek = currentDate.getDay() === 0 ? 6 : currentDate.getDay() - 1; // 0=Mon, 6=Sun
+                
+                if (selectedDaysForBulk.has(dayOfWeek)) {
+                    const dateStr = currentDate.toISOString().split('T')[0];
+                    
+                    // Check if shift already exists for this date and position
+                    const alreadyExists = shifts.some(s => s.date === dateStr && s.position === position);
+                    
+                    if (!alreadyExists) {
+                        shifts.push({
+                            id: Date.now() + shiftCount,
+                            date: dateStr,
+                            startTime,
+                            endTime,
+                            slots,
+                            position,
+                            createdBy: currentUser.id,
+                            createdAt: new Date().toISOString()
+                        });
+                        shiftCount++;
+                    }
+                }
+                
+                currentDate.setDate(currentDate.getDate() + 1);
+            }
+
+            if (shiftCount === 0) {
+                showNotification('All selected shifts already exist', 'warning');
+                return;
+            }
+
+            saveShifts(shifts);
+            showNotification(`✅ Created ${shiftCount} shifts!`, 'success');
+
+            // Reset form
+            document.getElementById('shiftStartTime').value = '17:00';
+            document.getElementById('shiftEndTime').value = '23:00';
+            document.getElementById('shiftSlots').value = '1';
+            document.getElementById('shiftPosition').value = '';
+            document.getElementById('rangeStartDate').value = '';
+            document.getElementById('rangeEndDate').value = '';
+            toggleClearAllDays();
+
+            displayShifts();
+        }
+
+        // Legacy function for single shift (kept for backward compatibility)
+        function createShift() {
+            createBulkShifts();
+        }
+
+        function displayShifts() {
+            const shifts = getShifts().sort((a, b) => new Date(a.date) - new Date(b.date));
+            const registrations = getRegistrations();
+            const users = getUsers();
+            const container = document.getElementById('shiftsContainer');
+
+            if (shifts.length === 0) {
+                container.innerHTML = '<div class="empty-state"><p>No shifts available at the moment.</p></div>';
+                return;
+            }
+
+            container.innerHTML = shifts.map(shift => {
+                const shiftRegistrations = registrations.filter(r => r.shiftId === shift.id);
+                const registered = shiftRegistrations.filter(r => r.userId !== currentUser.id);
+                const userRegistered = registrations.some(r => r.shiftId === shift.id && r.userId === currentUser.id);
+                const available = shiftRegistrations.length < shift.slots;
+                const registeredUsers = shiftRegistrations.map(r => users.find(u => u.id === r.userId)?.name || 'Unknown');
+
+                let statusClass = available ? 'status-available' : 'status-full';
+                let statusText = available ? 'Available' : 'Full';
+                if (userRegistered) {
+                    statusClass = 'status-registered';
+                    statusText = 'You registered';
+                }
+
+                const date = new Date(shift.date);
+                const dateStr = date.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+
+                let shiftActions = '';
+                if (currentUser.role !== 'manager') {
+                    if (userRegistered) {
+                        shiftActions = `<button class="btn-unregister" onclick="unregisterShift(${shift.id})" style="width: 100%;">${t('unregister')}</button>`;
+                    } else if (available) {
+                        shiftActions = `<button class="btn-register" onclick="registerShift(${shift.id})">${t('registerForShift')}</button>`;
+                    }
+                }
+
+                let adminActions = '';
+                if (currentUser.role === 'manager' || currentUser.role === 'superadmin') {
+                    adminActions = `<div class="shift-actions"><button type="button" class="btn-edit" onclick="openEditModal(${shift.id}); return false;">${t('editShift')}</button><button type="button" class="btn-delete" onclick="deleteShift(${shift.id}); return false;">${t('deleteShift')}</button></div>`;
+                }
+
+                // Show registered employees for admins
+                let registeredList = '';
+                if ((currentUser.role === 'manager' || currentUser.role === 'superadmin') && registeredUsers.length > 0) {
+                    registeredList = `
+                        <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #e0e0e0;">
+                            <div style="font-size: 12px; font-weight: 600; color: #666; margin-bottom: 6px;">${t('registered')}:</div>
+                            ${registeredUsers.map(name => `<div style="font-size: 12px; color: #c41e3a; padding: 3px 0;">✓ ${name}</div>`).join('')}
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="shift-card ${userRegistered ? 'registered' : ''}">
+                        <div class="shift-date">${dateStr}</div>
+                        <div class="shift-time">${shift.startTime} - ${shift.endTime}</div>
+                        <div class="shift-status ${statusClass}">${statusText}</div>
+                        <div class="shift-info">
+                            <div><strong>${t('position')}:</strong> ${shift.position}</div>
+                            <div><strong>${t('slots')}:</strong> ${shiftRegistrations.length}/${shift.slots}</div>
+                        </div>
+                        ${registeredList}
+                        <div style="display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                            ${shiftActions ? `<div>${shiftActions}</div>` : ''}
+                            ${adminActions}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function registerShift(shiftId) {
+            const registrations = getRegistrations();
+            registrations.push({ id: Date.now(), shiftId, userId: currentUser.id, registeredAt: new Date().toISOString() });
+            saveRegistrations(registrations);
+            showMessage(document.getElementById('dashboardMessage'), 'You registered for this shift!', 'success');
+            displayShifts();
+        }
+
+        function unregisterShift(shiftId) {
+            const requests = getCancellationRequests();
+            const existingRequest = requests.find(r => r.shiftId === shiftId && r.userId === currentUser.id && r.status === 'pending');
+
+            if (existingRequest) {
+                showMessage(document.getElementById('dashboardMessage'), 'You already have a pending cancellation request for this shift.', 'info');
+                return;
+            }
+
+            const shift = getShifts().find(s => s.id === shiftId);
+            const request = {
+                id: Date.now(),
+                shiftId,
+                userId: currentUser.id,
+                status: 'pending',
+                requestedAt: new Date().toISOString(),
+                shiftDate: shift.date,
+                shiftTime: `${shift.startTime} - ${shift.endTime}`,
+                shiftPosition: shift.position
+            };
+
+            requests.push(request);
+            saveCancellationRequests(requests);
+            showMessage(document.getElementById('dashboardMessage'), 'Cancellation request sent to manager for approval.', 'success');
+            displayShifts();
+        }
+
+        function openEditModal(shiftId) {
+            const shift = getShifts().find(s => s.id === shiftId);
+            if (shift) {
+                currentEditShiftId = shiftId;
+                document.getElementById('editDate').value = shift.date;
+                document.getElementById('editStart').value = shift.startTime;
+                document.getElementById('editEnd').value = shift.endTime;
+                document.getElementById('editSlots').value = shift.slots;
+                document.getElementById('editPosition').value = shift.position;
+                document.getElementById('editModal').classList.add('show');
+            }
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('show');
+            currentEditShiftId = null;
+        }
+
+        function saveEdit() {
+            const shifts = getShifts();
+            const idx = shifts.findIndex(s => s.id === currentEditShiftId);
+            if (idx !== -1) {
+                shifts[idx].date = document.getElementById('editDate').value;
+                shifts[idx].startTime = document.getElementById('editStart').value;
+                shifts[idx].endTime = document.getElementById('editEnd').value;
+                shifts[idx].slots = parseInt(document.getElementById('editSlots').value);
+                shifts[idx].position = document.getElementById('editPosition').value;
+                saveShifts(shifts);
+                showMessage(document.getElementById('dashboardMessage'), 'Shift updated successfully!', 'success');
+                closeEditModal();
+                displayShifts();
+                if (document.getElementById('calendarView').style.display !== 'none') renderCalendar();
+            }
+        }
+
+        function deleteShift(shiftId) {const shifts = getShifts();
+            const shift = shifts.find(s => s.id === shiftId);
+            
+            if (!shift) {showMessage(document.getElementById('dashboardMessage'), 'Shift not found', 'error');
+                return;
+            }
+            
+            const shiftDate = new Date(shift.date).toLocaleDateString();
+            
+            customConfirm(t('deleteShift'), `${t('deleteShiftConfirm')} (${shiftDate} ${shift.startTime}-${shift.endTime})`).then(confirmed => {if (confirmed) {saveShifts(getShifts().filter(s => s.id !== shiftId));
+                    saveRegistrations(getRegistrations().filter(r => r.shiftId !== shiftId));showMessage(document.getElementById('dashboardMessage'), t('shiftDeleted'), 'info');displayShifts();
+                    if (document.getElementById('calendarView')?.style.display !== 'none') renderCalendar();} else {}
+            });
+        }
+
+        function addDemoAccounts() {let users = getUsers();
+            
+            // Fresh install - create demo accounts
+            if (users.length === 0) {users = [
+                    { id: 1, name: 'Admin User', email: 'admin@restaurant.com', password: 'admin123', role: 'manager', googleCalendarConnected: false },
+                    { id: 2, name: 'John Doe', email: 'john@restaurant.com', password: 'john123', role: 'user', googleCalendarConnected: false },
+                    { id: 3, name: 'Grepolis Admin', email: 'grepolis445@gmail.com', password: 'Super123', role: 'superadmin', googleCalendarConnected: false }
+                ];
+                saveUsers(users);} else {
+                // Existing installation - clean up and ensure consistency// Remove old Restaurant Owner account if it exists
+                const oldOwnerIndex = users.findIndex(u => u.email === 'superadmin@restaurant.com');
+                if (oldOwnerIndex !== -1) {users.splice(oldOwnerIndex, 1);
+                }
+                
+                // Ensure correct roles (upgrade from old system)
+                users.forEach(u => {
+                    if (u.role === 'admin' || u.role === 'Admin') {
+                        u.role = 'manager';
+                    }
+                    if (!u.googleCalendarConnected) {
+                        u.googleCalendarConnected = false;
+                    }
+                });
+                
+                // Ensure Grepolis Admin exists
+                if (!users.find(u => u.email === 'grepolis445@gmail.com')) {const maxId = Math.max(...users.map(u => u.id), 0);
+                    users.push({
+                        id: maxId + 1,
+                        name: 'Grepolis Admin',
+                        email: 'grepolis445@gmail.com',
+                        password: 'Super123',
+                        role: 'superadmin',
+                        googleCalendarConnected: false
+                    });
+                }
+                
+                saveUsers(users);}
+            
+            // Initialize invite codes if not present
+            if (localStorage.getItem('inviteCodes') === null) {
+                localStorage.setItem('inviteCodes', JSON.stringify([]));
+            }
+            
+            // Initialize Google Calendar settings if not present
+            if (localStorage.getItem('googleCalendarSettings') === null) {
+                localStorage.setItem('googleCalendarSettings', JSON.stringify({
+                    connected: false,
+                    apiKey: null,
+                    restaurantCalendarId: null
+                }));
+            }}
+        
+        function getInviteCodes() { return JSON.parse(localStorage.getItem('inviteCodes') || '[]'); }
+        function saveInviteCodes(codes) { localStorage.setItem('inviteCodes', JSON.stringify(codes)); syncToServer('inviteCodes', codes); }
+        function getGoogleCalendarSettings() { return JSON.parse(localStorage.getItem('googleCalendarSettings') || '{}'); }
+        function saveGoogleCalendarSettings(settings) { localStorage.setItem('googleCalendarSettings', JSON.stringify(settings)); syncToServer('googleCalendarSettings', settings); }
+        
+        // Custom confirm modal
+        function customConfirm(title, message) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('confirmModal');
+                const titleEl = document.getElementById('confirmTitle');
+                const messageEl = document.getElementById('confirmMessage');
+                const okBtn = document.getElementById('confirmOk');
+                const cancelBtn = document.getElementById('confirmCancel');
+                
+                titleEl.textContent = title;
+                messageEl.textContent = message;
+                modal.style.display = 'flex';
+                
+                // Remove old event listeners by cloning
+                const okClone = okBtn.cloneNode(true);
+                const cancelClone = cancelBtn.cloneNode(true);
+                okBtn.parentNode.replaceChild(okClone, okBtn);
+                cancelBtn.parentNode.replaceChild(cancelClone, cancelBtn);
+                
+                document.getElementById('confirmOk').addEventListener('click', () => {
+                    modal.style.display = 'none';
+                    resolve(true);
+                });
+                
+                document.getElementById('confirmCancel').addEventListener('click', () => {
+                    modal.style.display = 'none';
+                    resolve(false);
+                });
+            });
+        }
+        
+        // Load data from localStorage
+        async function loadData() {
+            try {
+                const resp = await fetch('/api/data');
+                if (resp.ok) {
+                    const data = await resp.json();
+                    localStorage.setItem('users', JSON.stringify(data.users || []));
+                    localStorage.setItem('shifts', JSON.stringify(data.shifts || []));
+                    localStorage.setItem('registrations', JSON.stringify(data.registrations || []));
+                    localStorage.setItem('cancellationRequests', JSON.stringify(data.cancellationRequests || []));
+                    localStorage.setItem('inviteCodes', JSON.stringify(data.inviteCodes || []));
+                    localStorage.setItem('googleCalendarSettings', JSON.stringify(data.googleCalendarSettings || {}));return;
+                }
+            } catch (err) {
+                console.warn('Could not load from server, using localStorage fallback:', err);
+            }
+            // Fallback: initialize empty localStorage if needed
+            if (!localStorage.getItem('users')) localStorage.setItem('users', JSON.stringify([]));
+            if (!localStorage.getItem('shifts')) localStorage.setItem('shifts', JSON.stringify([]));
+            if (!localStorage.getItem('registrations')) localStorage.setItem('registrations', JSON.stringify([]));
+            if (!localStorage.getItem('cancellationRequests')) localStorage.setItem('cancellationRequests', JSON.stringify([]));
+        }
+
+        // PWA Installation Support
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+        });
+
+        function installApp() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        showNotification('App installed! Check your home screen.', 'success');
+                    }
+                    deferredPrompt = null;
+                });
+            }
+        }
+
+        // Register Service Worker for offline support
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('sw.js').then(function(registration) {
+                    console.log('Service Worker registered successfully:', registration);
+                }).catch(function(err) {
+                    console.log('Service Worker registration failed:', err);
+                });
+            });
+        }
+        
+        // Initialize the app
+        initializeDarkMode();
+        loadData().then(function() {
+            addDemoAccounts();
+            updatePageLanguage();
+        }).catch(function(err) {
+            console.error('Failed to initialize app:', err);
+            addDemoAccounts();
+            updatePageLanguage();
+        });
+
+    </script>
+
+    <!-- Bottom Navigation Bar (Mobile Only) -->
+    <div class="bottom-nav" id="bottomNav" style="display: none;">
+        <button onclick="toggleEmployeeView('myshifts'); updateBottomNav('myshifts')" id="navMyShifts" class="active">My Shifts</button>
+        <button onclick="toggleEmployeeView('list'); updateBottomNav('list')" id="navList">Available</button>
+        <button onclick="toggleEmployeeView('calendar'); updateBottomNav('calendar')" id="navCalendar">Calendar</button>
+        <button onclick="toggleEmployeeView('settings'); updateBottomNav('settings')" id="navSettings">Settings</button>
+    </div>
+</body>
+</html>
